@@ -307,6 +307,10 @@
 (goal-src "levels/extras-ctyslumc/extras-ctyslumc.gc" "process-focusable")
 (custom-level-cgo "ESC.DGO" "extras-ctyslumc/extras-ctyslumc.gd")
 
+(build-custom-level "mercenary")
+(goal-src "levels/mercenary/mercenary.gc" "process-focusable")
+(custom-level-cgo "MER.DGO" "mercenary/mercenary.gd")
+
 ;; generate the art group for a custom actor.
 ;; requires a .glb model file in custom_assets/jak1/models/custom_levels
 ;; to also generate a collide-mesh, add :gen-mesh #t

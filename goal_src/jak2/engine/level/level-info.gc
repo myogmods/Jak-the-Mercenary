@@ -15807,7 +15807,129 @@
     )
   )
 
+(define mercenary (new 'static 'level-load-info
+                   :index #x9f
+                   :task-level #x1
+                   :name 'mercenary
+                   :visname 'mercenary-vis
+                   :nickname 'mercenary
+                   :dbname 'mercenary
+                   :taskname 'city
+                   :packages '(gun-buoyp protectp)
+                   :memory-mode (load-buffer-mode borrow)
+                   :music-bank #f
+                   :ambient-sounds '()
+                   :mood-func 'update-mood-copy-ctywide
+                   :mood-init #f
+                   :ocean #f
+                   :sky #f
+                   :use-camera-other #f
+                   :continues '()
+                   :tasks '()
+                   :priority 100
+                   :load-commands '()
+                   :alt-load-commands '()
+                   :bsp-mask #xffffffffffffffff
+                   :buttom-height (meters -20)
+                   :run-packages '("common")
+                   :wait-for-load #f
+                   :login-func #f
+                   :activate-func #f
+                   :deactivate-func #f
+                   :kill-func #f
+                   :borrow-level (new 'static 'array symbol 2 #f #f)
+                   :borrow-display? (new 'static 'array symbol 2 #f #f)
+                   :texture-anim-tfrag #f
+                   :texture-anim-pris #f
+                   :texture-anim-shrub #f
+                   :texture-anim-alpha #f
+                   :texture-anim-water #f
+                   :texture-anim-twarp #f
+                   :texture-anim-pris2 #f
+                   :texture-anim-sprite #f
+                   :texture-anim-map #f
+                   :texture-anim-sky #f
+                   :draw-priority 10.0
+                   :fog-height 327680.0
+                   :bigmap-id (bigmap-id city)
+                   :ocean-near-translucent? #t
+                   :ocean-far? #f
+                   :mood-range (new 'static 'mood-range :data (new 'static 'array float 4 0.0 1.0 0.0 1.0))
+                   :max-rain 1.0
+                   :fog-mult 1.0
+                   :ocean-alpha 1.0
+                   :extra-sound-bank '((ctywide3 protect1))
+                   )
+        )
+
+(defmacro extras-level (index name visname nick mood-func level-size)
+  "shorthand for setting up an extras level"
+  `(new 'static 'level-load-info
+    :index ,index
+    :name ,name
+    :visname ,visname
+    :nickname ,nick
+    :dbname ,name
+    :taskname 'default
+    :packages '()
+    :memory-mode (load-buffer-mode borrow)
+    :music-bank #f
+    :ambient-sounds '()
+    :mood-func ,mood-func
+    :mood-init #f
+    :ocean #f
+    :sky #f
+    :use-camera-other #f
+    :part-engine-max 100
+    :continues '()
+    :tasks '()
+    :priority 50
+    :load-commands '()
+    :alt-load-commands '()
+    :bsp-mask #xffffffffffffffff
+    :buttom-height (meters -10000000)
+    :run-packages '()
+    :wait-for-load #t
+    :login-func #f
+    :activate-func #f
+    :deactivate-func #f
+    :kill-func #f
+    :borrow-level (new 'static 'array symbol 2 #f #f)
+    :borrow-display? (new 'static 'array symbol 2 #f #f)
+    :base-task-mask (task-mask task0)
+    :texture-anim-tfrag #f
+    :texture-anim-pris #f
+    :texture-anim-shrub #f
+    :texture-anim-alpha #f
+    :texture-anim-water #f
+    :texture-anim-twarp #f
+    :texture-anim-pris2 #f
+    :texture-anim-sprite #f
+    :texture-anim-map #f
+    :texture-anim-sky #f
+    :draw-priority 9.0
+    :level-flags (level-load-flags extras)
+    :fog-height 327680.0
+    :bigmap-id (bigmap-id city)
+    :ocean-near-translucent? #f
+    :ocean-far? #f
+    :mood-range (new 'static 'mood-range :data (new 'static 'array float 4 0.0 1.0 0.0 1.0))
+    :max-rain 1.0
+    :fog-mult 1.0
+    :ocean-alpha 1.0
+    :extra-sound-bank #f
+    )
+  )
+
+(defmacro extras-borrow-level (index name visname nick mood-func)
+  "shorthand for setting up an extras borrow level"
+ `(extras-level ,index ,name ,visname ,nick ,mood-func borrow)
+  )
+
+(define extras-ctyslumc        (extras-borrow-level #xA0 'extras-ctyslumc        'extras-ctyslumc-vis        'esc 'update-mood-ctyslumc))
+
 (#when PC_PORT
   (cons! *level-load-list* 'test-zone)
+  (cons! *level-load-list* 'mercenary)
   (cons! *level-load-list* 'extras-ctyslumc)
   )
