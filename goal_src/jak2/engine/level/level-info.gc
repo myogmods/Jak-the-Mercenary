@@ -6863,8 +6863,9 @@
     :activate-func #f
     :deactivate-func #f
     :kill-func #f
-    :borrow-level (new 'static 'array symbol 2 #f #f)
-    :borrow-display? (new 'static 'array symbol 2 #f #f)
+    :borrow-size (new 'static 'array uint16 2 160 160)
+    :borrow-level (new 'static 'array symbol 2 #f 'extras-ctyslumc)
+    :borrow-display? (new 'static 'array symbol 2 #f 'display)
     :texture-anim-tfrag #f
     :texture-anim-pris #f
     :texture-anim-shrub #f
@@ -15808,4 +15809,5 @@
 
 (#when PC_PORT
   (cons! *level-load-list* 'test-zone)
+  (cons! *level-load-list* 'extras-ctyslumc)
   )
