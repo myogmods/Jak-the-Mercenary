@@ -370,7 +370,7 @@
           "demo-start"
           )
          (*debug-segment*
-           "game-start"
+           "ctyslumc-seal-movie" ;; "game-start"
            )
          (else
            "title-start"
