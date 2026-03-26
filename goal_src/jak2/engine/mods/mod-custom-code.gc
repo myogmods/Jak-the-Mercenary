@@ -21,6 +21,10 @@
     ;; Begin function defintions.
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+    (defun wider-view () ;; Set camera fov to 94.0 (way better imo)
+      (set-setting-by-param *setting-control* 'fov #f (* 182.04445 94) 0) 
+    )
+
     (defun runs-every-frame ()
       ;; (increase-power-cell-by-one) This is a call to increase-power-cell-by-one defined in mod-common-functions.gc
 
@@ -91,6 +95,7 @@
 
     (defun runs-on-jak-spawn ()
       ;; Code here runs every time jak spawns (loading a file new game or death)   
+      (wider-view)
 
       (none)
       )
