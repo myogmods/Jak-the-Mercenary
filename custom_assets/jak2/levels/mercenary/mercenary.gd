@@ -4,5 +4,10 @@
 ;; the actual file name still needs to be 8.3
 ("MER.DGO"
  (
+  "gun-buoy.o"
+  "mercenary.o"
+  "tpage-2869.go"
+  "gun-buoy-ag.go"
+  "transport-ag.go"
   "mercenary.go"
   ))

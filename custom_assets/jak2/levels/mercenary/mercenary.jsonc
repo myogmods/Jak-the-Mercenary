@@ -38,7 +38,8 @@
   // Removed so that the release builds don't have to double-decompile the game
   //"art_groups": ["prsn-torture-ag"],
   "art_groups":   [
-                  
+                  "gun-buoy-ag",
+                  "transport-ag"
                   ],
 
   // If you have any custom models in the "custom_assets/jak2/models/custom_levels" folder that you want to use in your level, add them to this list.
@@ -56,6 +57,19 @@
                 ],
 
   "actors" : [
-    
+    {
+    // this is not working because I can't spawn the navmesh without loading lprotect
+      "trans": [662.209, 6.414, -603.7321], // translation
+      "etype": "gun-buoy", // actor type
+      "game_task": 0, // associated game task (for powercells, etc)
+      "kill_mask": 0,
+      "quat": [0, 0, 0, 1], // quaternion
+      "bsphere": [662.209, 6.414, -603.732, 6.928], // bounding sphere
+      "lump": {
+        "name": "gun-buoy-2",
+        "enemy-options": 393217,
+        "nav-mesh-actor": ["uint32", 36435] // value is the "aid" of the nav-mesh, not the "nav-mesh" itself
+              }
+    }
   ]
 }
