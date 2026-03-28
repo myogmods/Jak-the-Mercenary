@@ -80,6 +80,8 @@
   (samos-garage 65)
   (baron-consite 66)
   (whack-a-metal-hiphog 67)
+  ;; custom entries
+  (burning-bush-slumc-2 68)
   )
 
 (defenum game-task-action

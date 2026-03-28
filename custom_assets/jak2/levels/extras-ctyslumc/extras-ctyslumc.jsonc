@@ -58,8 +58,8 @@
       "quat" : [0.00,  -0.09,   0.00,  -0.99], // rotation
       "bsphere": [-2.70, 3.50, 64, 10], // bounding sphere
       "lump": {
-        "name":"burning-bush-69"
-        // "task-actor": ["int32", 31]
+        "name":"burning-bush-69",
+        "task-actor": ["int32", 68]
       }
     }
   ]
