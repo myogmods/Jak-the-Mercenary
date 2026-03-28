@@ -15812,7 +15812,7 @@
                    :task-level #x1
                    :name 'mercenary
                    :visname 'mercenary-vis
-                   :nickname 'mercenary
+                   :nickname 'mer
                    :dbname 'mercenary
                    :taskname 'city
                    :packages '(gun-buoyp protectp)
@@ -15858,7 +15858,7 @@
                    :max-rain 1.0
                    :fog-mult 1.0
                    :ocean-alpha 1.0
-                   :extra-sound-bank '((ctywide3 protect1))
+                   :extra-sound-bank #f ;; '((ctywide3 lprotect))
                    )
         )
 
