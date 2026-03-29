@@ -1034,6 +1034,16 @@
             :play-continue "stadiumd-race-fail"
             :kiosk-play-continue #f
             )
+          ;; custom entries 
+          (new 'static 'game-task-info
+            :name "city-burning-bush-slumc-mercenary"
+            :pre-play-node (game-task-node city-burning-bush-slumc-mercenary-bronze)
+            :kiosk-play-node (game-task-node city-burning-bush-slumc-mercenary-silver)
+            :pre-play-continue "ctyslumc-seal-movie"
+            :play-node (game-task-node city-burning-bush-slumc-mercenary-silver)
+            :play-continue "ctyslumc-seal-movie"
+            :kiosk-play-continue #f
+            )
           )
         )
   (set! (-> gp-0 sub-task-list)
@@ -12304,6 +12314,134 @@
                                                    (the-as symbol (and v1-1 (= (-> v1-1 info taskname) (-> arg0 level))))
                                                    )
                     )
+            :on-close #f
+            )
+          ;; custom entries 
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-slumc-mercenary)
+            :name "city-burning-bush-slumc-mercenary-introduction"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-slumc-2)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-04)
+                :scene "bb16int"
+                )
+              (new 'static 'game-task-event
+                :actor (game-task-actor minimap)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-52)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag save-on-try)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node none) ;; (game-task-node city-protect-water-slums-resolution) add later
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? (lambda ((arg0 game-task-node-info)) (!= *kernel-boot-message* 'preview))
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-slumc-mercenary)
+            :name "city-burning-bush-slumc-mercenary-resolution"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-slumc-2)
+                :action (game-task-action play)
+                :tex (game-task-icon gaticon-06)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag close-task save-on-life task-retry city-wait task-manager)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node city-burning-bush-slumc-mercenary-introduction)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info (new 'static 'task-manager-info
+              :level 'mercenary
+              :intro-scene #f
+              :resolution-scene #f
+              :resolution-scene-continue #f
+              :retry-continue "ctyslumc-seal-movie"
+              :fail-continue "ctyslumc-seal-movie"
+              :init-hook #f
+              :cleanup-hook #f
+              :update-hook #f
+              :code-hook #f
+              :complete-hook #f
+              :fail-hook #f
+              :event-hook #f
+              :final-node (game-task-node city-burning-bush-slumc-mercenary-resolution)
+              :on-complete #f
+              :on-fail #f
+              )
+            :borrow '((ctywide 0 mercenary display))
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-slumc-mercenary)
+            :name "city-burning-bush-slumc-mercenary-bronze"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node none) ;; (game-task-node city-burning-bush-slumc-mercenary-introduction)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-slumc-mercenary)
+            :name "city-burning-bush-slumc-mercenary-silver"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node city-burning-bush-slumc-mercenary-bronze)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-slumc-mercenary)
+            :name "city-burning-bush-slumc-mercenary-gold"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node city-burning-bush-slumc-mercenary-silver)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
             :on-close #f
             )
           )
