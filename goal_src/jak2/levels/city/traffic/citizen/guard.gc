@@ -1314,6 +1314,9 @@
     )
   )
 
+(define-extern *merc-tracking-active* symbol)
+(define-extern *merc-kill-count* int)
+
 (defstate inactive (crimson-guard)
   :virtual #t
   :enter (behavior ()
