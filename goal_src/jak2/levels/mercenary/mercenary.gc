@@ -317,6 +317,15 @@
       ;; slave[19] = kill counter HUD (uses built-in hud-score type)
       (set! (-> self slave 19)
             (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
+      ;; Play a random soundtrack once on mission start
+      (case (the int (* (rand-vu) 6.0))
+        ((0) (set-setting! 'music 'danger4  0.0 0)) ;; kor boss theme
+        ((1) (set-setting! 'music 'danger6  0.0 0)) ;; krew boss theme
+        ((2) (set-setting! 'music 'danger7  0.0 0)) ;; tomb boss theme
+        ((3) (set-setting! 'music 'danger9  0.0 0)) ;; tanker ambush theme
+        ((4) (set-setting! 'music 'danger11 0.0 0)) ;; fortress dump theme
+        ((5) (set-setting! 'music 'battle   0.0 0)) ;; "secret" mountain temple rockslide theme
+        )
       (set! (-> self data-int32 2) 1)
       )
 
