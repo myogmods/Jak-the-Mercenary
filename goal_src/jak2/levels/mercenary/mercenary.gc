@@ -1,6 +1,22 @@
 ;;-*-Lisp-*-
 (in-package goal)
 
+(define-extern crimson-guard type)
+
+(define *merc-tracking-active* #f)
+(define *merc-kill-count* 0)
+
+(defmethod cleanup-for-death ((this crimson-guard))
+  ;; zero hit-points = combat death, not a despawn/leave
+  (when (and *merc-tracking-active* (zero? (-> this hit-points)))
+    (+! *merc-kill-count* 1)
+    (set! (-> *game-info* score) (the float *merc-kill-count*))
+    )
+  ;; always call through to the real cleanup so nothing else breaks
+  ((method-of-type enemy cleanup-for-death) this)
+  (none)
+  )
+
 (deftype city-slums-mercenary-transport-info (structure)
   ((id          uint32)
    (spawned     basic)
@@ -269,7 +285,9 @@
     (dotimes (gp-1 (length *city-slums-mercenary-transport-info*))
       (set! (-> *city-slums-mercenary-transport-info* gp-1 spawned) #f)
       )
-    (set! (-> self data-int32 0) 0)
+    (set! *merc-kill-count* 0)
+    (set! *merc-tracking-active* #t)
+    (set! (-> *game-info* score) 0.0)
     0
     (none)
     )
@@ -289,12 +307,16 @@
     (set-setting! 'music 'danger4 0.0 0)
     (local-vars (s5-4 object))
 
-    ;; --- TIMER INIT (runs once on first frame) ---
+    ;; --- TIMER + KILL HUD INIT (runs once on first frame) ---
     (when (zero? (-> self data-int32 2))
       (set-time! (-> self start-time))
       (set! (-> self time-limit) (seconds 180))  ;; 3 minutes
+      ;; slave[18] = countdown timer HUD
       (set! (-> self slave 18)
             (ppointer->handle (process-spawn hud-timer :init hud-init-by-other :to self)))
+      ;; slave[19] = kill counter HUD (uses built-in hud-score type)
+      (set! (-> self slave 19)
+            (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
       (set! (-> self data-int32 2) 1)
       )
 
@@ -309,10 +331,13 @@
         (set! (-> *game-info* timer) remaining)
         (when (<= remaining (the-as time-frame 0))
           (send-event (handle->process (-> self slave 18)) 'hide-and-die)
+          (send-event (handle->process (-> self slave 19)) 'hide-and-die)
           (go-virtual fail)
           )
         )
       )
+
+    (set! (-> *game-info* score) (the float *merc-kill-count*))
 
     ;; --- BLOCKING PLANE (spawned once) ---
     (when (zero? (-> self data-int32 1))
@@ -437,6 +462,9 @@
   TASK_MANAGER_CLEANUP_HOOK
   (lambda :behavior task-manager
     ()
+    (set! *merc-tracking-active* #f)
+    ;; Kill points hud
+    (send-event (handle->process (-> self slave 19)) 'hide-and-die)
     ;; Remove the blocking plane
     (let ((wall-proc (process-by-name "blocking-plane-slumc-mercenary" *active-pool*)))
       (when wall-proc

@@ -1317,6 +1317,15 @@
 (defstate inactive (crimson-guard)
   :virtual #t
   :enter (behavior ()
+    ;; modified to increment mercenary game kill counter when guard fall in water.
+    ;; they don't "die" when falling in water, just moved to inactive state and despawned, so this mod is necessary.
+    (when (and *merc-tracking-active*
+               (logtest? (-> self focus-status) (focus-status touch-water))
+               )
+      (+! *merc-kill-count* 1)
+      (set! (-> *game-info* score) (the float *merc-kill-count*))
+      )
+      
     (when (-> self minimap)
       (logior! (-> self minimap flags) (minimap-flag fade-out))
       (set! (-> self minimap) #f)
