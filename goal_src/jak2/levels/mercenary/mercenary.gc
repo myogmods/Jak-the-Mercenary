@@ -368,12 +368,15 @@
   TASK_MANAGER_UPDATE_HOOK
   (lambda :behavior task-manager
     ()
+    ;; give everything except gun-upgrade-ammo and board
     (logior! (-> *game-info* features) (game-feature 
-      gun gun-yellow gun-red gun-blue gun-dark
+      gun gun-yellow gun-red gun-blue gun-dark 
+      board
       gun-upgrade-speed gun-upgrade-ammo 
       pass-red pass-green pass-yellow pass-blue 
+      darkjak darkjak-bomb0 darkjak-bomb1 darkjak-invinc darkjak-giant
       ))
-    (set-setting! 'music 'danger4 0.0 0)
+    (logclear! (-> *game-info* features) (game-feature gun-upgrade-damage pass-red pass-green pass-yellow pass-blue))
     (local-vars (s5-4 object))
 
     ;; --- TIMER + KILL HUD INIT (runs once on first frame) ---
@@ -395,6 +398,16 @@
         ((4) (set-setting! 'music 'danger11 0.0 0)) ;; fortress dump theme
         ((5) (set-setting! 'music 'battle   0.0 0)) ;; "secret" mountain temple rockslide theme
         )
+      ;; Set up stats to be consistent each time 
+      (send-event *target* 'get-pickup (pickup-type eco-pill-dark) -100.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-red)    -100.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-yellow) -200.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-blue)   -200.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-dark)   -10.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-red)    50.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-yellow) 100.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-blue)   100.0)
+      (send-event *target* 'get-pickup (pickup-type ammo-dark)   5.0)
       (set! (-> self data-int32 2) 1)
       )
 
