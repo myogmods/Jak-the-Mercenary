@@ -15748,7 +15748,7 @@
     :continues '((new 'static 'continue-point
         :name "test-zone-start"
         :level 'test-zone
-        :trans (new 'static 'vector :x 0.0 :y (meters 10) :z (meters 10) :w 1.0)
+        :trans (new 'static 'vector :x (meters 0.0333) :y (meters 1.0473) :z (meters 1.3339) :w 1.0)
         :quat (new 'static 'vector :y 0.061 :w 0.9981)
         :camera-trans (new 'static 'vector :x 0.0 :y (meters 1) :z 0.0 :w 1.0)
         :camera-rot (new 'static 'inline-array vector3s 3
