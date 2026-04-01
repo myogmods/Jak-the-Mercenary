@@ -717,24 +717,19 @@
       (set! (-> self slave 19)
             (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
       ;; Play a random soundtrack once on mission start
-      (case (the int (* (rand-vu) 6.0))
+      (case (the int (* (rand-vu) 5.0))
         ((0) (set-setting! 'music 'danger4  0.0 0)) ;; kor boss theme
         ((1) (set-setting! 'music 'danger6  0.0 0)) ;; krew boss theme
         ((2) (set-setting! 'music 'danger7  0.0 0)) ;; tomb boss theme
         ((3) (set-setting! 'music 'danger9  0.0 0)) ;; tanker ambush theme
         ((4) (set-setting! 'music 'danger11 0.0 0)) ;; fortress dump theme
-        ((5) (set-setting! 'music 'battle   0.0 0)) ;; "secret" mountain temple rockslide theme
         )
       ;; Set up stats to be consistent each time 
-      (send-event *target* 'get-pickup (pickup-type eco-pill-dark) -100.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-red)    -100.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-yellow) -200.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-blue)   -200.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-dark)   -10.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-red)    50.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-yellow) 100.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-blue)   100.0)
-      (send-event *target* 'get-pickup (pickup-type ammo-dark)   5.0)
+      (set! (-> *game-info* eco-pill-dark) 0.0)
+      (set! (-> *game-info* gun-ammo 0) (-> *FACT-bank* ammo-yellow-start))
+      (set! (-> *game-info* gun-ammo 1) (-> *FACT-bank* ammo-red-start))
+      (set! (-> *game-info* gun-ammo 2) (-> *FACT-bank* ammo-blue-start))
+      (set! (-> *game-info* gun-ammo 3) (-> *FACT-bank* ammo-dark-start))
       (set! (-> self data-int32 2) 1)
       )
 

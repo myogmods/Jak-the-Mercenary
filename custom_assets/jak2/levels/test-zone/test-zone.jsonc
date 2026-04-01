@@ -70,40 +70,23 @@
   // by setting "save_texture_pngs" to true in the decompiler config.
   // The format is ["tpage-name", "texture-name1", "texture-name2", ...].
   // If you want all textures from a tpage, you can just do ["tpage-name"].
-  "textures": ["yak-medfur-end"], // for yakow texture fix
+  "textures": [], 
 
   "actors": [
     {
-      "trans": [-15.2818, 15.2461, 17.136], // translation
+      "trans": [-3.7209, 1.0473, 29.9281], // translation
       "etype": "crate", // actor type
       "game_task": 0, // associated game task (for powercells, etc)
       "kill_mask": 0,
       "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [-15.2818, 15.2461, 17.136, 10], // bounding sphere
+      "bsphere": [-3.7209, 1.0473, 29.9281, 10], // bounding sphere
       "lump": {
         "name": "test-crate",
-        "eco-info": ["eco-info", "(pickup-type health)", 2]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 3]
       }
     },
 
     {
-      "trans": [-5.463, 17.4553, 1.6169], // translation
-      "etype": "eco-yellow", // actor type
-      "game_task": "(game-task none)", // associated game task (for powercells, etc)
-      "kill_mask": 0,
-      "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [-5.463, 17.4553, 1.6169, 10], // bounding sphere
-      "lump": {
-        "name": "test-eco"
-      }
-    },
-
-    {
-      "trans": [-7.41, 1.04, 28.42], // translation
-      "etype": "yakow", // actor type
-      "game_task": "(game-task none)", // associated game task (for powercells, etc)
-      "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [-7.41, 1.04, 28.42, 10], // bounding sphere
       "trans": [-0.71, 1.10, 29.7412], // translation
       "etype": "merc-darkeco-barrel",  // actor type
       "game_task": 0, // associated game task (for powercells, etc)

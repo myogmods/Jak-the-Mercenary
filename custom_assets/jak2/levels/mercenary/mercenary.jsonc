@@ -272,9 +272,19 @@
         "eco-info": ["eco-info", "(pickup-type ammo-random)", 6]
       }
     },
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////// NOT WORKING ////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    {
+    // this is not working because I can't spawn the navmesh without loading lprotect.
+    // level is better without the gun-buoy anyway tbh 
+      "trans": [662.209, 6.414, -603.7321],
+      "etype": "gun-buoy",
+      "game_task": 0,
       "kill_mask": 0,
-      "quat": [0, 0, 0, 1], // quaternion
-      "bsphere": [662.209, 6.414, -603.732, 6.928], // bounding sphere
+      "quat": [0, 0, 0, 1],
+      "bsphere": [662.209, 6.414, -603.732, 6.928],
       "lump": {
         "name": "gun-buoy-2",
         "enemy-options": 393217,
