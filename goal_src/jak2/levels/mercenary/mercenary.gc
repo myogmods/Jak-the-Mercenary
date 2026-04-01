@@ -932,10 +932,10 @@
       (set-time! (-> self start-time))
       (set! (-> self time-limit) (seconds 180))  ;; 3 minutes
       ;; slave[18] = countdown timer HUD
-      (set! (-> self slave 18)
+      (set! (-> self slave 27)
             (ppointer->handle (process-spawn hud-timer :init hud-init-by-other :to self)))
       ;; slave[19] = kill counter HUD (uses built-in hud-score type)
-      (set! (-> self slave 19)
+      (set! (-> self slave 28)
             (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
       ;; Play a random soundtrack once on mission start
       (case (the int (* (rand-vu) 5.0))
@@ -964,8 +964,8 @@
           )
         (set! (-> *game-info* timer) remaining)
         (when (<= remaining (the-as time-frame 0))
-          (send-event (handle->process (-> self slave 18)) 'hide-and-die)
-          (send-event (handle->process (-> self slave 19)) 'hide-and-die)
+          (send-event (handle->process (-> self slave 27)) 'hide-and-die)
+          (send-event (handle->process (-> self slave 28)) 'hide-and-die)
           (go-virtual fail)
           )
         )
@@ -975,7 +975,7 @@
 
     ;; --- SECURITY WALL (spawned once) ---
     (when (zero? (-> self data-int32 1))
-      (set! (-> self slave 10)
+      (set! (-> self slave 30)
       (ppointer->handle
         (process-spawn security-wall
           (new 'static 'vector :x (meters 434.7774) :y (meters -1.62) :z (meters -268.0775) :w 1.0)
@@ -1103,7 +1103,7 @@
     ()
     (set! *merc-tracking-active* #f)
     ;; Kill points hud
-    (send-event (handle->process (-> self slave 19)) 'hide-and-die)
+    (send-event (handle->process (-> self slave 28)) 'hide-and-die)
     (let ((a0-0 *traffic-manager*))
       (send-event a0-0 'restore-default-settings)
       )
