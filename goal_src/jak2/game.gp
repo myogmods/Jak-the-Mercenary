@@ -312,9 +312,10 @@
 (custom-level-cgo "MER.DGO" "mercenary/mercenary.gd")
 
 ;; generate the art group for a custom actor.
-;; requires a .glb model file in custom_assets/jak1/models/custom_levels
+;; requires a .glb model file in custom_assets/jak2/models/custom_levels
 ;; to also generate a collide-mesh, add :gen-mesh #t
 (build-actor "test-actor" :force-run #t :gen-mesh #t)
+(build-actor "merc-darkeco-barrel" :force-run #t :gen-mesh #t)
 
 ;;;;;;;;;;;;;;;;;;;;;
 ;; ANIMATIONS

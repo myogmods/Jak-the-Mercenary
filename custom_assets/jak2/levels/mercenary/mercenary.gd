@@ -9,5 +9,6 @@
   "tpage-2869.go"
   "gun-buoy-ag.go"
   "transport-ag.go"
+  "merc-darkeco-barrel-ag.go"
   "mercenary.go"
   ))

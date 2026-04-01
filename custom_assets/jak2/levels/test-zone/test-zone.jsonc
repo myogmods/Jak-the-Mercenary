@@ -59,7 +59,10 @@
 
   // If you have any custom models in the "custom_assets/jak2/models/custom_levels" folder that you want to use in your level, add them to this list.
   // Note: Like with art groups, these should also be added to your level's .gd file.
-  "custom_models": ["test-actor"],
+  "custom_models": [
+                   "test-actor",
+                   "merc-darkeco-barrel",
+                   ],
 
   // Any textures you want to include in your custom level.
   // This is mainly useful for textures which are not in the common level files and have no art group associated with them.
@@ -101,8 +104,13 @@
       "game_task": "(game-task none)", // associated game task (for powercells, etc)
       "quat": [0, 0, 0, 1], // quaternion
       "bsphere": [-7.41, 1.04, 28.42, 10], // bounding sphere
+      "trans": [-0.71, 1.10, 29.7412], // translation
+      "etype": "merc-darkeco-barrel",  // actor type
+      "game_task": 0, // associated game task (for powercells, etc)
+      "quat" : [0, 0, 0, 1], // quaternion
+      "bsphere": [-0.71, 30.31, 29.74, 10], // bounding sphere
       "lump": {
-        "name": "test-yakow"
+        "name": "merc-darkeco-barrel"
       }
     },
 

@@ -6,6 +6,8 @@
  (
   ;; "yakow.o" ;; leave this out, so it will spawn dummy viewer process (otherwise yakow needs navmesh)
   "yakow-ag.go"
+  "mercenary.o"
+  "merc-darkeco-barrel-ag.go"
   "test-zone-obs.o"
   "test-actor-ag.go"
   "test-zone.go"
