@@ -10,5 +10,7 @@
   "gun-buoy-ag.go"
   "transport-ag.go"
   "merc-darkeco-barrel-ag.go"
+  "clock-blue-50s-ag.go"
+  "clock-gold-90s-ag.go"
   "mercenary.go"
   ))

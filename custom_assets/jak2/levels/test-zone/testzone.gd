@@ -4,10 +4,10 @@
 ;; the actual file name still needs to be 8.3
 ("TSZ.DGO"
  (
-  ;; "yakow.o" ;; leave this out, so it will spawn dummy viewer process (otherwise yakow needs navmesh)
-  "yakow-ag.go"
   "mercenary.o"
   "merc-darkeco-barrel-ag.go"
+  "clock-blue-50s-ag.go"
+  "clock-gold-90s-ag.go"
   "test-zone-obs.o"
   "test-actor-ag.go"
   "test-zone.go"

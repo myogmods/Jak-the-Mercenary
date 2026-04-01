@@ -62,6 +62,8 @@
   "custom_models": [
                    "test-actor",
                    "merc-darkeco-barrel",
+                   "clock-blue-50s",
+                   "clock-gold-90s"
                    ],
 
   // Any textures you want to include in your custom level.
@@ -93,7 +95,29 @@
       "quat" : [0, 0, 0, 1], // quaternion
       "bsphere": [-0.71, 30.31, 29.74, 10], // bounding sphere
       "lump": {
-        "name": "merc-darkeco-barrel"
+        "name": "merc-darkeco-barrel-test"
+      }
+    },
+    
+    {
+      "trans": [16.51,   3.67,  28.56], // translation
+      "etype": "clock-gold-90s",  // actor type
+      "game_task": 0, // associated game task (for powercells, etc)
+      "quat" : [0, 0, 0, 1], // quaternion
+      "bsphere": [-0.71, 30.31, 29.74, 10], // bounding sphere
+      "lump": {
+        "name": "clock-gold-90s-test"
+      }
+    },
+
+    {
+      "trans": [16.92,   3.67,  14.70], // translation
+      "etype": "clock-blue-50s",  // actor type
+      "game_task": 0, // associated game task (for powercells, etc)
+      "quat" : [0, 0, 0, 1], // quaternion
+      "bsphere": [-0.71, 30.31, 29.74, 10], // bounding sphere
+      "lump": {
+        "name": "clock-blue-50s-test"
       }
     },
 
