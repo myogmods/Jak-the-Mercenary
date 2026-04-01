@@ -741,6 +741,54 @@
                                         :t-quat (new 'static 'quaternion :x 0.0001 :y 0.0476 :z 0.0015 :w 0.9988)
                                         :num-guard #x14
                                         )
+                                      (new 'static 'city-slums-mercenary-transport-info
+                                        :id #x12
+                                        :plane-pos (new 'static 'vector :x (meters 627.48) :y (meters   6.84) :z (meters -645.63) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y 0.13 :z -0.00 :w 0.99)
+                                        :t-pos (new 'static 'vector :x (meters 624.31) :y (meters  16.10) :z (meters -654.27) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x -0.00 :y -0.99 :z -0.00 :w 0.12)
+                                        :num-guard #x14
+                                        )
+                                      (new 'static 'city-slums-mercenary-transport-info
+                                        :id #x13
+                                        :plane-pos (new 'static 'vector :x (meters 623.70) :y (meters   2.90) :z (meters -700.40) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y -0.18 :z 0.00 :w 0.98)
+                                        :t-pos (new 'static 'vector :x (meters 626.25) :y (meters  14.81) :z (meters -706.00) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x 0.00 :y -0.98 :z -0.00 :w -0.19)
+                                        :num-guard #x14
+                                        )
+                                      (new 'static 'city-slums-mercenary-transport-info
+                                        :id #x14
+                                        :plane-pos (new 'static 'vector :x (meters 573.64) :y (meters   5.73) :z (meters -679.86) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y -0.79 :z 0.00 :w -0.61)
+                                        :t-pos (new 'static 'vector :x (meters 566.87) :y (meters  16.32) :z (meters -678.99) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x 0.00 :y -0.66 :z 0.00 :w 0.75)
+                                        :num-guard #x14
+                                        )
+                                      (new 'static 'city-slums-mercenary-transport-info
+                                        :id #x15
+                                        :plane-pos (new 'static 'vector :x (meters 510.62) :y (meters   9.80) :z (meters -675.61) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y 0.07 :z -0.00 :w 0.99)
+                                        :t-pos (new 'static 'vector :x (meters 509.42) :y (meters  17.81) :z (meters -691.29) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x -0.00 :y -0.99 :z -0.00 :w 0.03)
+                                        :num-guard #x14
+                                        )
+                                      (new 'static 'city-slums-mercenary-transport-info
+                                        :id #x16
+                                        :plane-pos (new 'static 'vector :x (meters 510.60) :y (meters  10.47) :z (meters -727.21) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y -0.71 :z -0.00 :w 0.69)
+                                        :t-pos (new 'static 'vector :x (meters 522.31) :y (meters  19.26) :z (meters -727.19) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x -0.00 :y -0.77 :z -0.00 :w -0.63)
+                                        :num-guard #x14
+                                        )
+                                      (new 'static 'city-slums-mercenary-transport-info
+                                        :id #x17
+                                        :plane-pos (new 'static 'vector :x (meters 686.31) :y (meters   5.44) :z (meters -478.81) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y 0.77 :z 0.00 :w 0.62)
+                                        :t-pos (new 'static 'vector :x (meters 677.81) :y (meters  15.31) :z (meters -476.68) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x 0.00 :y 0.66 :z 0.00 :w -0.75)
+                                        :num-guard #x14
+                                        )
                                       )
         )
 
