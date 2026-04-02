@@ -456,9 +456,6 @@
   ;; custom entries
   (city-burning-bush-slumc-mercenary-introduction)
   (city-burning-bush-slumc-mercenary-resolution)
-  (city-burning-bush-slumc-mercenary-bronze)
-  (city-burning-bush-slumc-mercenary-silver)
-  (city-burning-bush-slumc-mercenary-gold)
   )
 ;; ---game-task-node
 

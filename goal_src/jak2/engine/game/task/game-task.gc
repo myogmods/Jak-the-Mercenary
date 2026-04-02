@@ -1037,11 +1037,11 @@
           ;; custom entries 
           (new 'static 'game-task-info
             :name "city-burning-bush-slumc-mercenary"
-            :pre-play-node (game-task-node city-burning-bush-slumc-mercenary-bronze)
-            :kiosk-play-node (game-task-node city-burning-bush-slumc-mercenary-silver)
-            :pre-play-continue "ctyslumc-seal-movie"
-            :play-node (game-task-node city-burning-bush-slumc-mercenary-silver)
-            :play-continue "ctyslumc-seal-movie"
+            :pre-play-node (game-task-node city-burning-bush-slumc-mercenary-introduction)
+            :kiosk-play-node (game-task-node city-burning-bush-slumc-mercenary-resolution)
+            :pre-play-continue #f
+            :play-node (game-task-node city-burning-bush-slumc-mercenary-resolution)
+            :play-continue "ctyslumc-slums"
             :kiosk-play-continue #f
             )
           )
@@ -12373,8 +12373,8 @@
               :intro-scene #f
               :resolution-scene #f
               :resolution-scene-continue #f
-              :retry-continue "ctyslumc-seal-movie"
-              :fail-continue "ctyslumc-seal-movie"
+              :retry-continue "ctyslumc-slums"
+              :fail-continue #f
               :init-hook #f
               :cleanup-hook #f
               :update-hook #f
@@ -12387,60 +12387,6 @@
               :on-fail #f
               )
             :borrow '((ctywide 0 mercenary display))
-            :open? #f
-            :on-close #f
-            )
-          (new 'static 'game-task-node-info
-            :level 'city
-            :task (game-task city-burning-bush-slumc-mercenary)
-            :name "city-burning-bush-slumc-mercenary-bronze"
-            :when-open #f
-            :flags (game-task-node-flag save-on-life)
-            :parent-node (new 'static 'array game-task-node 4
-              (game-task-node none) ;; (game-task-node city-burning-bush-slumc-mercenary-introduction)
-              (game-task-node none)
-              (game-task-node none)
-              (game-task-node none)
-              )
-            :on-open #f
-            :info #f
-            :borrow '()
-            :open? #f
-            :on-close #f
-            )
-          (new 'static 'game-task-node-info
-            :level 'city
-            :task (game-task city-burning-bush-slumc-mercenary)
-            :name "city-burning-bush-slumc-mercenary-silver"
-            :when-open #f
-            :flags (game-task-node-flag save-on-life)
-            :parent-node (new 'static 'array game-task-node 4
-              (game-task-node city-burning-bush-slumc-mercenary-bronze)
-              (game-task-node none)
-              (game-task-node none)
-              (game-task-node none)
-              )
-            :on-open #f
-            :info #f
-            :borrow '()
-            :open? #f
-            :on-close #f
-            )
-          (new 'static 'game-task-node-info
-            :level 'city
-            :task (game-task city-burning-bush-slumc-mercenary)
-            :name "city-burning-bush-slumc-mercenary-gold"
-            :when-open #f
-            :flags (game-task-node-flag save-on-life)
-            :parent-node (new 'static 'array game-task-node 4
-              (game-task-node city-burning-bush-slumc-mercenary-silver)
-              (game-task-node none)
-              (game-task-node none)
-              (game-task-node none)
-              )
-            :on-open #f
-            :info #f
-            :borrow '()
             :open? #f
             :on-close #f
             )
