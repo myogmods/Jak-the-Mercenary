@@ -1303,10 +1303,26 @@
   TASK_MANAGER_CODE_HOOK
   (lambda :behavior task-manager
     ()
-    (until #f
+    (when (or
+            ;; Always play voice line on the very first attempt
+            (zero? (-> *game-info* sub-task-list (game-task-node city-burning-bush-slumc-mercenary-resolution) death-count))
+            ;; 10% chance on all subsequent attempts
+            (rand-vu-percent? 0.1)
+            )
+      (suspend-for (seconds 3))
+      (case (the int (* (rand-vu) 2.0))
+        ;; "Jak: This is payback!"
+        ((0) (add-process *gui-control* self (gui-channel daxter) (gui-action play) "jak066" -99.0 0))
+        ;; "Daxter: We got company jak, lots of guards!"
+        ((1) (add-process *gui-control* self (gui-channel daxter) (gui-action play) "ds152" -99.0 0))
+        )
+      )
+    ;; Constantly check if the results flag is set
+    (until (nonzero? (-> self data-int32 5))
       (suspend)
       )
-    #f
+    ;; Now run the results screen
+    (merc-show-results)
     (none)
     )
   )
