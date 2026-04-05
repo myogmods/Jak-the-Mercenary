@@ -586,7 +586,7 @@
   (none)
   )
 
-(deftype city-slums-mercenary-transport-info (structure)
+(deftype city-waterslums-mercenary-transport-info (structure)
   ((id          uint32)
    (spawned     basic)
    (plane-pos   vector      :inline)
@@ -597,15 +597,15 @@
    )
   )
 
-(define *city-slums-mercenary-transport-info* (new 'static 'boxed-array :type city-slums-mercenary-transport-info
-                                      (new 'static 'city-slums-mercenary-transport-info
+(define *city-waterslums-mercenary-transport-info* (new 'static 'boxed-array :type city-waterslums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :plane-pos (new 'static 'vector :x 3095165.2 :y 37526.324 :z -2934498.0 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :y 0.0178 :w 0.9998)
                                         :t-pos (new 'static 'vector :x 2939573.8 :y 61440.0 :z -2691468.5 :w 1.0)
                                         :t-quat (new 'static 'quaternion :y 0.3598 :w -0.933)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x1
                                         :plane-pos (new 'static 'vector :x 2892557.0 :y 29433.447 :z -2661706.2 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0007 :y -0.4948 :z 0.0013 :w 0.869)
@@ -613,7 +613,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.001 :y -0.5269 :z 0.0011 :w 0.8498)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x2
                                         :plane-pos (new 'static 'vector :x 2990101.2 :y 38305.793 :z -2735072.0 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :y 0.4134 :z -0.0015 :w -0.9105)
@@ -621,7 +621,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.0014 :y -0.3754 :z 0.0005 :w 0.9268)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x3
                                         :plane-pos (new 'static 'vector :x 3058367.2 :y 27387.084 :z -2246145.2 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0011 :y -0.0362 :z 0.0009 :w 0.9993)
@@ -629,7 +629,7 @@
                                         :t-quat (new 'static 'quaternion :y 0.7931 :w -0.609)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x4
                                         :plane-pos (new 'static 'vector :x 3053228.5 :y 26790.297 :z -2491042.2 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x -0.0006 :y -0.2174 :z -0.0012 :w -0.976)
@@ -637,7 +637,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.001 :y -0.0806 :z 0.0008 :w 0.9967)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x5
                                         :plane-pos (new 'static 'vector :x 3006777.0 :y 17257.678 :z -2312612.8 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :y -0.3316 :z -0.0013 :w 0.9434)
@@ -645,7 +645,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.0001 :y 0.4182 :z -0.0013 :w -0.9083)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x6
                                         :plane-pos (new 'static 'vector :x 2715756.5 :y 30702.387 :z -2200581.8 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :y -0.4639 :z 0.0013 :w 0.8858)
@@ -653,7 +653,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.0002 :y 0.6653 :z -0.0013 :w -0.7465)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x7
                                         :plane-pos (new 'static 'vector :x 2520547.8 :y 37126.965 :z -2310556.0 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0014 :y 0.6249 :z -0.0006 :w -0.7806)
@@ -661,7 +661,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.0008 :y -0.9106 :z -0.0011 :w 0.413)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x8
                                         :plane-pos (new 'static 'vector :x 2477350.0 :y 30634.395 :z -2239698.5 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0012 :y 0.1168 :z -0.0008 :w 0.9931)
@@ -669,7 +669,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.0008 :y -0.1427 :z 0.0011 :w -0.9897)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x9
                                         :plane-pos (new 'static 'vector :x 2285256.0 :y 33538.457 :z -2189906.8 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :y -0.6014 :w 0.7989)
@@ -677,7 +677,7 @@
                                         :t-quat (new 'static 'quaternion :y -0.7502 :w 0.6611)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #xa
                                         :plane-pos (new 'static 'vector :x 2153970.0 :y 34320.383 :z -2080023.4 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :y -0.1532 :w 0.9881)
@@ -685,7 +685,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.0013 :y 0.0828 :z 0.0003 :w -0.9965)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #xb
                                         :plane-pos (new 'static 'vector :x 2169575.5 :y 47590.605 :z -1779327.0 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0015 :y 0.1973 :z 0.0003 :w -0.9803)
@@ -693,7 +693,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.0012 :y 0.172 :z -0.0008 :w 0.985)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #xc
                                         :plane-pos (new 'static 'vector :x 1921790.8 :y 30183.014 :z -1487026.6 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0015 :y 0.1582 :z 0.0004 :w -0.9874)
@@ -701,7 +701,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.001 :y -0.9566 :z 0.0011 :w 0.2913)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #xd
                                         :plane-pos (new 'static 'vector :x 1703265.9 :y 20098.252 :z -1322308.9 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x -0.0014 :y -0.1073 :z -0.0005 :w 0.9942)
@@ -709,7 +709,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.0014 :y -0.0343 :z -0.0006 :w 0.9994)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #xe
                                         :plane-pos (new 'static 'vector :x 1749161.1 :y 22818.816 :z -1555168.9 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0014 :y 0.0245 :z 0.0006 :w -0.9996)
@@ -717,7 +717,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.0013 :y -0.7978 :z 0.0007 :w 0.6028)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #xf
                                         :plane-pos (new 'static 'vector :x 1852649.5 :y 17886.822 :z -1740609.1 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.001 :y 0.3503 :z -0.0009 :w -0.9366)
@@ -725,7 +725,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.0007 :y 0.1395 :z 0.0011 :w -0.9902)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x10
                                         :plane-pos (new 'static 'vector :x 2073022.5 :y 30489.395 :z -1919885.8 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.0013 :y -0.7611 :z 0.0008 :w 0.6486)
@@ -733,7 +733,7 @@
                                         :t-quat (new 'static 'quaternion :y -0.6727 :w 0.7398)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x11
                                         :plane-pos (new 'static 'vector :x 1850323.0 :y 29569.844 :z -1880109.0 :w 1.0)
                                         :plane-quat (new 'static 'quaternion :y 0.1031 :z 0.0015 :w 0.9946)
@@ -741,7 +741,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.0001 :y 0.0476 :z 0.0015 :w 0.9988)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x12
                                         :plane-pos (new 'static 'vector :x (meters 627.48) :y (meters   6.84) :z (meters -645.63) :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.00 :y 0.13 :z -0.00 :w 0.99)
@@ -749,7 +749,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.00 :y -0.99 :z -0.00 :w 0.12)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x13
                                         :plane-pos (new 'static 'vector :x (meters 623.70) :y (meters   2.90) :z (meters -700.40) :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.00 :y -0.18 :z 0.00 :w 0.98)
@@ -757,7 +757,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.00 :y -0.98 :z -0.00 :w -0.19)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x14
                                         :plane-pos (new 'static 'vector :x (meters 573.64) :y (meters   5.73) :z (meters -679.86) :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.00 :y -0.79 :z 0.00 :w -0.61)
@@ -765,7 +765,7 @@
                                         :t-quat (new 'static 'quaternion :x 0.00 :y -0.66 :z 0.00 :w 0.75)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x15
                                         :plane-pos (new 'static 'vector :x (meters 510.62) :y (meters   9.80) :z (meters -675.61) :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.00 :y 0.07 :z -0.00 :w 0.99)
@@ -773,7 +773,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.00 :y -0.99 :z -0.00 :w 0.03)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x16
                                         :plane-pos (new 'static 'vector :x (meters 510.60) :y (meters  10.47) :z (meters -727.21) :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.00 :y -0.71 :z -0.00 :w 0.69)
@@ -781,7 +781,7 @@
                                         :t-quat (new 'static 'quaternion :x -0.00 :y -0.77 :z -0.00 :w -0.63)
                                         :num-guard #x14
                                         )
-                                      (new 'static 'city-slums-mercenary-transport-info
+                                      (new 'static 'city-waterslums-mercenary-transport-info
                                         :id #x17
                                         :plane-pos (new 'static 'vector :x (meters 686.31) :y (meters   5.44) :z (meters -478.81) :w 1.0)
                                         :plane-quat (new 'static 'quaternion :x 0.00 :y 0.77 :z 0.00 :w 0.62)
@@ -865,7 +865,7 @@
   ;; Save highscore
   (game-info-method-28 *game-info* (the-as game-score 8) (-> *game-info* score))
   ;; Despawn all transports
-  (dotimes (i (length *city-slums-mercenary-transport-info*))
+  (dotimes (i (length *city-waterslums-mercenary-transport-info*))
            (when (handle->process (-> self slave i))
                  (send-event (handle->process (-> self slave i)) 'leave)
            )
@@ -1095,8 +1095,8 @@
                                                                         )
                                                                       )
                        )
-    (dotimes (gp-1 (length *city-slums-mercenary-transport-info*))
-      (set! (-> *city-slums-mercenary-transport-info* gp-1 spawned) #f)
+    (dotimes (gp-1 (length *city-waterslums-mercenary-transport-info*))
+      (set! (-> *city-waterslums-mercenary-transport-info* gp-1 spawned) #f)
       )
     (set! *merc-kill-count* 0)
     (set! *merc-tracking-active* #t)
