@@ -1157,7 +1157,7 @@
   TASK_MANAGER_UPDATE_HOOK
   (lambda :behavior task-manager
     ()
-    ;; give everything except gun-upgrade-ammo and board
+    ;; give everything except gun-upgrade-damage
     (logior! (-> *game-info* features) (game-feature 
       gun gun-yellow gun-red gun-blue gun-dark 
       board
@@ -1165,142 +1165,131 @@
       pass-red pass-green pass-yellow pass-blue 
       darkjak darkjak-bomb0 darkjak-bomb1 darkjak-invinc darkjak-giant
       ))
-    (logclear! (-> *game-info* features) (game-feature gun-upgrade-damage pass-red pass-green pass-yellow pass-blue))
+    (logclear! (-> *game-info* features) (game-feature gun-upgrade-damage pass-red pass-green pass-yellow))
+    ;; Remove all cheats player could be using
+    (logclear! (-> *game-info* secrets) (game-secrets invulnerable))
+    (logclear! (-> *game-info* secrets) (game-secrets endless-dark))
+    (logclear! (-> *game-info* secrets) (game-secrets endless-ammo))
     (local-vars (s5-4 object))
-
-    ;; --- TIMER + KILL HUD INIT (runs once on first frame) ---
-    (when (zero? (-> self data-int32 2))
-      (set-time! (-> self start-time))
-      (set! (-> self time-limit) (seconds 180))  ;; 3 minutes
-      ;; slave[18] = countdown timer HUD
-      (set! (-> self slave 27)
-            (ppointer->handle (process-spawn hud-timer :init hud-init-by-other :to self)))
-      ;; slave[19] = kill counter HUD (uses built-in hud-score type)
-      (set! (-> self slave 28)
-            (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
-      ;; Play a random soundtrack once on mission start
-      (case (the int (* (rand-vu) 5.0))
-        ((0) (set-setting! 'music 'danger4  0.0 0)) ;; kor boss theme
-        ((1) (set-setting! 'music 'danger6  0.0 0)) ;; krew boss theme
-        ((2) (set-setting! 'music 'danger7  0.0 0)) ;; tomb boss theme
-        ((3) (set-setting! 'music 'danger9  0.0 0)) ;; tanker ambush theme
-        ((4) (set-setting! 'music 'danger11 0.0 0)) ;; fortress dump theme
-        )
-      ;; Set up stats to be consistent each time 
-      (set! (-> *game-info* eco-pill-dark) 0.0)
-      (set! (-> *game-info* gun-ammo 0) (-> *FACT-bank* ammo-yellow-start))
-      (set! (-> *game-info* gun-ammo 1) (-> *FACT-bank* ammo-red-start))
-      (set! (-> *game-info* gun-ammo 2) (-> *FACT-bank* ammo-blue-start))
-      (set! (-> *game-info* gun-ammo 3) (-> *FACT-bank* ammo-dark-start))
-      (set! (-> self data-int32 2) 1)
+    ;; Once weather has fully transitioned to heavy rain, lock it with override
+    (when (and (not (-> *mood-control* overide-weather-flag))
+              (>= (-> *mood-control* current-interp cloud) 0.99)
+              (>= (-> *mood-control* current-interp fog) 0.99)
+              )
+      (set! (-> *mood-control* overide-weather-flag) #t)
+      (set! (-> *mood-control* overide cloud) 1.0)
+      (set! (-> *mood-control* overide fog) 1.0)
       )
-
-    ;; --- TIMER UPDATE (runs every frame after init) ---
+    ;; TIMER UPDATE (update timer every frame)
     (when (nonzero? (-> self data-int32 2))
-      (let* ((elapsed   (- (-> *display* game-clock frame-counter) (-> self start-time)))
-             (remaining (- (-> self time-limit) elapsed))
-             )
-        (when (< remaining (the-as time-frame 0))
-          (set! remaining (the-as time-frame 0))
-          )
-        (set! (-> *game-info* timer) remaining)
-        (when (<= remaining (the-as time-frame 0))
+      (let ((remaining (the-as int (- (-> self time-limit)
+                                      (- (-> *display* game-clock frame-counter)
+                                        (-> self start-time)
+                                        )
+                                      )
+                      )
+            )
+            )
+        (if (< (the-as time-frame remaining) 0)
+            (set! remaining 0)
+            )
+        (set! (-> *game-info* timer) (the-as time-frame remaining))
+        (when (zero? remaining)
           (send-event (handle->process (-> self slave 27)) 'hide-and-die)
           (send-event (handle->process (-> self slave 28)) 'hide-and-die)
-          (go-virtual fail)
+          (set! (-> self data-int32 5) 1) ;; Set flag to run (merc-show-results)
+          ;; (go-virtual fail)
           )
         )
       )
-
+    ;; set current score every frame to dead guard count
     (set! (-> *game-info* score) (the float *merc-kill-count*))
-
-    ;; --- SECURITY WALL (spawned once) ---
-    (when (zero? (-> self data-int32 1))
-      (set! (-> self slave 30)
-      (ppointer->handle
-        (process-spawn security-wall
-          (new 'static 'vector :x (meters 434.7774) :y (meters -1.62) :z (meters -268.0775) :w 1.0)
-          (new 'static 'vector :x (meters 374.5089) :y (meters -1.62) :z (meters -273.4227) :w 1.0)
-          (meters 40)
-          :init security-wall-init-by-other
-          :name "security-wall-slumc-mercenary"
+    ;; Update hud-goal with highscore
+    ;; game-score index 8 was unused so this is our persistent save slot
+    (let ((hi-ref (get-game-score-ref *game-info* 8)))
+          ;; calulate whether current score or high score is higher to show the higher.
+      (if (>= (-> *game-info* score) (-> hi-ref 0))
+          ;; Current run is the new best, show live score
+          (set! (-> *game-info* goal) (-> *game-info* score))
+          ;; Show saved highscore
+          (set! (-> *game-info* goal) (-> hi-ref 0))
           )
-        )
       )
-      (set! (-> self data-int32 1) 1)
-    )
-      
-    (cond
-      ((zero? (-> self data-int32 0))
-       (dotimes (gp-1 (length *city-slums-mercenary-transport-info*))
-         (let ((s5-1 (-> *city-slums-mercenary-transport-info* gp-1)))
-           (new 'stack-no-clear 'vector)
-           (new 'stack-no-clear 'vector)
-           (new 'stack-no-clear 'vector)
-           (new 'stack-no-clear 'vector)
-           0.0
-           (let ((f0-7 (vector-vector-xz-distance (target-pos 0) (-> s5-1 t-pos))))
-             (cond
-               ((and (< f0-7 327680.0) (< 204800.0 f0-7))
-                (when (and (not (handle->process (-> self slave gp-1))) (< (the int (-> self data-float gp-1)) (current-time)))
-                  (let ((s4-2 (new 'stack-no-clear 'transport-params)))
-                    (let ((s3-2 (new 'stack-no-clear 'vector)))
-                      (set! (-> s3-2 quad) (-> s5-1 t-pos quad))
-                      (set! (-> s4-2 spawn-pos quad) (-> s5-1 t-pos quad))
-                      (quaternion-copy! (-> s4-2 quat) (-> s5-1 t-quat))
-                      (set! (-> s4-2 max-guard) (-> s5-1 num-guard))
-                      (set! (-> s4-2 max-guard) (the-as uint 8))
-                      (set! (-> s4-2 turret?) #t)
-                      (set! (-> s4-2 speeches?) #t)
-                      (set! (-> s3-2 y) 0.0)
-                      )
-                    (let ((a0-16 (as-type (entity-nav-mesh-by-aid (the-as actor-id 9070)) entity-nav-mesh)))
-                      (when a0-16
-                        (set! (-> s4-2 nav-mesh) (-> a0-16 nav-mesh))
-                        (set! (-> self slave gp-1) (ppointer->handle (process-spawn transport s4-2 :to self)))
+    ;; Only run transport spawning/completion when not in results screen
+    (when (zero? (-> self data-int32 6))
+      ;; Vanilla code to spawn transports etc
+      (cond
+        ((zero? (-> self data-int32 0))
+         (dotimes (gp-1 (length *city-waterslums-mercenary-transport-info*))
+           (let ((s5-1 (-> *city-waterslums-mercenary-transport-info* gp-1)))
+             (new 'stack-no-clear 'vector)
+             (new 'stack-no-clear 'vector)
+             (new 'stack-no-clear 'vector)
+             (new 'stack-no-clear 'vector)
+             0.0
+             (let ((f0-7 (vector-vector-xz-distance (target-pos 0) (-> s5-1 t-pos))))
+               (cond
+                 ((and (< f0-7 (meters 90)) (< (meters 50) f0-7)) ;; Converted to meters and increased max distance from 80 to 90 to spawn transports
+                  (when (and (not (handle->process (-> self slave gp-1))) (< (the int (-> self data-float gp-1)) (current-time)))
+                    (let ((s4-2 (new 'stack-no-clear 'transport-params)))
+                      (let ((s3-2 (new 'stack-no-clear 'vector)))
+                        (set! (-> s3-2 quad) (-> s5-1 t-pos quad))
+                        (set! (-> s4-2 spawn-pos quad) (-> s5-1 t-pos quad))
+                        (quaternion-copy! (-> s4-2 quat) (-> s5-1 t-quat))
+                        (set! (-> s4-2 max-guard) (-> s5-1 num-guard))
+                        (set! (-> s4-2 max-guard) (the-as uint 8))
+                        (set! (-> s4-2 turret?) #t)
+                        (set! (-> s4-2 speeches?) #t)
+                        (set! (-> s3-2 y) 0.0)
+                        )
+                      (let ((a0-16 (as-type (entity-nav-mesh-by-aid (the-as actor-id 9070)) entity-nav-mesh)))
+                        (when a0-16
+                          (set! (-> s4-2 nav-mesh) (-> a0-16 nav-mesh))
+                          (set! (-> self slave gp-1) (ppointer->handle (process-spawn transport s4-2 :to self)))
+                          )
                         )
                       )
                     )
                   )
-                )
-               ((< 368640.0 f0-7)
-                (if (handle->process (-> self slave gp-1))
-                    (send-event (handle->process (-> self slave gp-1)) 'leave)
-                    )
-                )
+                 ((< 368640.0 f0-7)
+                  (if (handle->process (-> self slave gp-1))
+                      (send-event (handle->process (-> self slave gp-1)) 'leave)
+                      )
+                  )
+                 )
                )
              )
-           )
-         (if (and (handle->process (-> self slave gp-1))
-                  (begin
-                    (let ((s5-5 #t)
-                          (a1-11 (new 'stack-no-clear 'event-message-block))
+           (if (and (handle->process (-> self slave gp-1))
+                    (begin
+                      (let ((s5-5 #t)
+                            (a1-11 (new 'stack-no-clear 'event-message-block))
+                            )
+                        (set! (-> a1-11 from) (process->ppointer self))
+                        (set! (-> a1-11 num-params) 0)
+                        (set! (-> a1-11 message) 'guards-left)
+                        (let ((v1-75 (the-as object (send-event-function (handle->process (-> self slave gp-1)) a1-11))))
+                          (cmove-#f-nonzero s5-4 v1-75 s5-5)
                           )
-                      (set! (-> a1-11 from) (process->ppointer self))
-                      (set! (-> a1-11 num-params) 0)
-                      (set! (-> a1-11 message) 'guards-left)
-                      (let ((v1-75 (the-as object (send-event-function (handle->process (-> self slave gp-1)) a1-11))))
-                        (cmove-#f-nonzero s5-4 v1-75 s5-5)
                         )
+                      s5-4
                       )
-                    s5-4
                     )
-                  )
-             (set! (-> self data-float gp-1) (the float (+ (current-time) (seconds 20))))
-             )
+               (set! (-> self data-float gp-1) (the float (+ (current-time) (seconds 20))))
+               )
+           )
          )
-       )
-      (else
-        (let ((gp-2 0))
-          (dotimes (s5-6 (length *city-slums-mercenary-transport-info*))
-            (when (handle->process (-> self slave s5-6))
-              (send-event (handle->process (-> self slave s5-6)) 'leave)
-              (+! gp-2 1)
+        (else
+          (let ((gp-2 0))
+            (dotimes (s5-6 (length *city-waterslums-mercenary-transport-info*))
+              (when (handle->process (-> self slave s5-6))
+                (send-event (handle->process (-> self slave s5-6)) 'leave)
+                (+! gp-2 1)
+                )
               )
+            (if (zero? gp-2)
+                (go-virtual complete)
+                )
             )
-          (if (zero? gp-2)
-              (go-virtual complete)
-              )
           )
         )
       )
