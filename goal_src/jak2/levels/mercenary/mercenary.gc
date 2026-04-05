@@ -986,6 +986,13 @@
   TASK_MANAGER_INIT_HOOK
   (lambda :behavior task-manager
     ()
+    (case (the int (* (rand-vu) 5.0))
+        ((0) (set-setting! 'music 'danger4  0.0 0)) ;; kor boss theme
+        ((1) (set-setting! 'music 'danger6  0.0 0)) ;; krew boss theme
+        ((2) (set-setting! 'music 'danger7  0.0 0)) ;; tomb boss theme
+        ((3) (set-setting! 'music 'danger9  0.0 0)) ;; tanker ambush theme
+        ((4) (set-setting! 'music 'danger11 0.0 0)) ;; fortress dump theme
+        )
     (merc-show-rules)
     (set-setting! 'exclusive-task #f 0.0 (-> self node-info task))
     (set-setting! 'airlock #f 0.0 0)
