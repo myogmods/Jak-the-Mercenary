@@ -1338,7 +1338,12 @@
   *game-info*
   (game-task-node city-burning-bush-slumc-mercenary-resolution)
   TASK_MANAGER_FAIL_HOOK
-  (lambda :behavior task-manager () (none))
+  (lambda :behavior task-manager ()
+    (merc-show-results)
+    ;; Ignore current continue on Triangle press after dying  
+    (set-continue! *game-info* (-> self info fail-continue) #f)
+    (none)
+    )
   )
 
 (set-subtask-hook!
