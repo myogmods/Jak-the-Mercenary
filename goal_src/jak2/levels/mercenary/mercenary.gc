@@ -1353,11 +1353,30 @@
   (lambda :behavior task-manager
     ()
     (set! *merc-tracking-active* #f)
+    ;; Kill timer hud 
+    (send-event (handle->process (-> self slave 27)) 'hide-and-die)
     ;; Kill points hud
     (send-event (handle->process (-> self slave 28)) 'hide-and-die)
+    ;; Kill high-score hud
+    (send-event (handle->process (-> self slave 31)) 'hide-and-die)
+
+    ;; Restore normal traffic settings 
     (let ((a0-0 *traffic-manager*))
       (send-event a0-0 'restore-default-settings)
       )
+    
+    ;; Remove override so weather system takes over again
+    (set! (-> *mood-control* overide-weather-flag) #f)
+    ;; Set current weather to heavy rain right now
+    (set! (-> *mood-control* current-interp cloud) 1.0)
+    (set! (-> *mood-control* current-interp fog) 1.0)
+    ;; Set target to heavy rain with a slow transition speed
+    ;; so it takes a long time before the random system picks a new target
+    (set! (-> *mood-control* target-interp cloud) 1.0)
+    (set! (-> *mood-control* target-interp fog) 1.0)
+    ;; Reset the random timer to a long delay before next weather change
+    (set-time-for-random-weather! *mood-control* 18000.0 18000.0)
+    
     ;; Remove security wall
     (let ((wall-proc (process-by-name "security-wall-slumc-mercenary" *active-pool*)))
       (when wall-proc
