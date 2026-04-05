@@ -1100,8 +1100,53 @@
       )
     (set! *merc-kill-count* 0)
     (set! *merc-tracking-active* #t)
+    (set! (-> self data-int32 0) 0)  ;; mission transport dead completion flag
+    (set! (-> self data-int32 1) 0)  ;; blocking plane spawned flag
+    (set! (-> self data-int32 2) 0)  ;; first-frame init flag
+    (set! (-> self data-int32 3) 0)  ;; kill count
+    (set! (-> self data-int32 4) 0)  ;; prev dead guards
+    (set! (-> self data-int32 6) 0)  ;; keep spawn transports flag
     (set! (-> *game-info* score) 0.0)
-    0
+    (set! (-> *game-info* goal) (-> (get-game-score-ref *game-info* 8) 0))
+    (set! (-> self start-time) (-> *display* game-clock frame-counter))
+    (set! (-> self time-limit) (seconds 120))
+    (set! (-> self slave 27)
+          (ppointer->handle (process-spawn hud-timer :init hud-init-by-other :to self)))
+    (set! (-> self slave 28)
+          (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
+    (set! (-> self slave 31)
+          (ppointer->handle (process-spawn hud-goal :init hud-init-by-other :to self)))
+    ;; Set up stats to be consistent each time 
+      (set! (-> *game-info* eco-pill-dark) 0.0)
+      (set! (-> *game-info* gun-ammo 0) (-> *FACT-bank* ammo-yellow-start))
+      (set! (-> *game-info* gun-ammo 1) (-> *FACT-bank* ammo-red-start))
+      (set! (-> *game-info* gun-ammo 2) (-> *FACT-bank* ammo-blue-start))
+      (set! (-> *game-info* gun-ammo 3) (-> *FACT-bank* ammo-dark-start))
+    ;; Start gradual transition toward heavy rain
+    (set! (-> *mood-control* overide-weather-flag) #f)
+    (set! (-> *mood-control* target-interp cloud) 1.0)
+    (set! (-> *mood-control* target-interp fog) 1.0)
+    ;; Speed of 45.0, takes 45 seconds to reach full rain
+    (set! (-> *mood-control* speed-interp cloud) 45.0)
+    (set! (-> *mood-control* speed-interp fog) 45.0)
+    ;; Prevent random weather from interrupting the transition
+    (set-time-for-random-weather! *mood-control* 99999.0 99999.0)
+    ;; Set up security wall
+    (set! (-> self slave 30)
+      (ppointer->handle
+        (process-spawn security-wall
+          (new 'static 'vector :x (meters 434.7774) :y (meters -1.62) :z (meters -268.0775) :w 1.0)
+          (new 'static 'vector :x (meters 374.5089) :y (meters -1.62) :z (meters -273.4227) :w 1.0)
+          (meters 40)
+          :init security-wall-init-by-other
+          :name "security-wall-slumc-mercenary"
+        )
+      )
+    )
+    ;; Reset result screen flag  
+    (set! (-> self data-int32 5) 0)
+    ;; Mark timer as initialized
+    (set! (-> self data-int32 2) 1)
     (none)
     )
   )
