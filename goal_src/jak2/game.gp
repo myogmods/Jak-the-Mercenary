@@ -307,6 +307,18 @@
 (goal-src "levels/extras-ctyslumc/extras-ctyslumc.gc" "process-focusable")
 (custom-level-cgo "ESC.DGO" "extras-ctyslumc/extras-ctyslumc.gd")
 
+(build-custom-level "extras-ctygenc")
+(goal-src "levels/extras-ctygenc/extras-ctygenc.gc" "process-focusable")
+(custom-level-cgo "EGC.DGO" "extras-ctygenc/extras-ctygenc.gd")
+
+(build-custom-level "extras-ctymarkb")
+(goal-src "levels/extras-ctymarkb/extras-ctymarkb.gc" "process-focusable")
+(custom-level-cgo "EMB.DGO" "extras-ctymarkb/extras-ctymarkb.gd")
+
+(build-custom-level "extras-forest")
+(goal-src "levels/extras-forest/extras-forest.gc" "process-focusable")
+(custom-level-cgo "EFO.DGO" "extras-forest/extras-forest.gd")
+
 (build-custom-level "mercenary")
 (goal-src "levels/mercenary/mercenary.gc" "process-focusable")
 (custom-level-cgo "MER.DGO" "mercenary/mercenary.gd")

@@ -5381,8 +5381,9 @@
     :activate-func 'forest-activate
     :deactivate-func 'forest-deactivate
     :kill-func #f
-    :borrow-level (new 'static 'array symbol 2 #f #f)
-    :borrow-display? (new 'static 'array symbol 2 #f #f)
+    :borrow-size (new 'static 'array uint16 2 160 160)
+    :borrow-level (new 'static 'array symbol 2 #f 'extras-forest)
+    :borrow-display? (new 'static 'array symbol 2 #f 'display)
     :base-task-mask (task-mask task0)
     :texture-anim-tfrag #f
     :texture-anim-pris #f
@@ -6264,8 +6265,9 @@
     :activate-func #f
     :deactivate-func #f
     :kill-func #f
-    :borrow-level (new 'static 'array symbol 2 #f #f)
-    :borrow-display? (new 'static 'array symbol 2 #f #f)
+    :borrow-size (new 'static 'array uint16 2 160 160)
+    :borrow-level (new 'static 'array symbol 2 #f 'extras-ctygenc)
+    :borrow-display? (new 'static 'array symbol 2 #f 'display)
     :texture-anim-tfrag #f
     :texture-anim-pris #f
     :texture-anim-shrub #f
@@ -8386,8 +8388,9 @@
     :activate-func 'market-activate
     :deactivate-func #f
     :kill-func #f
-    :borrow-level (new 'static 'array symbol 2 #f #f)
-    :borrow-display? (new 'static 'array symbol 2 #f #f)
+    :borrow-size (new 'static 'array uint16 2 160 160)
+    :borrow-level (new 'static 'array symbol 2 #f 'extras-ctymarkb)
+    :borrow-display? (new 'static 'array symbol 2 #f 'display)
     :texture-anim-tfrag #f
     :texture-anim-pris #f
     :texture-anim-shrub #f
@@ -15927,9 +15930,15 @@
   )
 
 (define extras-ctyslumc        (extras-borrow-level #xA0 'extras-ctyslumc        'extras-ctyslumc-vis        'esc 'update-mood-ctyslumc))
+(define extras-ctygenc         (extras-borrow-level #xA1 'extras-ctygenc         'extras-ctygenc-vis         'egc 'update-mood-copy-ctywide))
+(define extras-ctymarkb        (extras-borrow-level #xA2 'extras-ctymarkb        'extras-ctymarkb-vis        'emb 'update-mood-ctymarkb))
+(define extras-forest          (extras-borrow-level #xA3 'extras-forest          'extras-forest-vis          'efo 'update-mood-forest))
 
 (#when PC_PORT
   (cons! *level-load-list* 'test-zone)
-  (cons! *level-load-list* 'mercenary)
   (cons! *level-load-list* 'extras-ctyslumc)
+  (cons! *level-load-list* 'extras-ctygenc)
+  (cons! *level-load-list* 'extras-ctymarkb)
+  (cons! *level-load-list* 'extras-forest)
+  (cons! *level-load-list* 'mercenary)
   )
