@@ -319,9 +319,9 @@
 (goal-src "levels/extras-forest/extras-forest.gc" "process-focusable")
 (custom-level-cgo "EFO.DGO" "extras-forest/extras-forest.gd")
 
-(build-custom-level "mercenary")
-(goal-src "levels/mercenary/mercenary.gc" "process-focusable")
-(custom-level-cgo "MER.DGO" "mercenary/mercenary.gd")
+(build-custom-level "merc-slumc")
+(goal-src "levels/merc-slumc/merc-slumc.gc" "process-focusable")
+(custom-level-cgo "MSC.DGO" "merc-slumc/merc-slumc.gd")
 
 ;; generate the art group for a custom actor.
 ;; requires a .glb model file in custom_assets/jak2/models/custom_levels

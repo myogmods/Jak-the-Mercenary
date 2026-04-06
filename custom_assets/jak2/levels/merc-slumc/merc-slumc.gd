@@ -2,7 +2,7 @@
 ;; We use the convention of having a longer DGO name for levels without precomputed visibility.
 
 ;; the actual file name still needs to be 8.3
-("MER.DGO"
+("MSC.DGO"
  (
   "gun-buoy.o"
   "mercenary.o"
@@ -12,5 +12,5 @@
   "merc-darkeco-barrel-ag.go"
   "clock-blue-50s-ag.go"
   "clock-gold-90s-ag.go"
-  "mercenary.go"
+  "merc-slumc.go"
   ))

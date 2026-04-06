@@ -12369,7 +12369,7 @@
               )
             :on-open #f
             :info (new 'static 'task-manager-info
-              :level 'mercenary
+              :level 'merc-slumc
               :intro-scene #f
               :resolution-scene #f
               :resolution-scene-continue #f
@@ -12386,7 +12386,7 @@
               :on-complete #f
               :on-fail #f
               )
-            :borrow '((ctywide 0 mercenary display))
+            :borrow '((ctywide 0 merc-slumc display))
             :open? #f
             :on-close #f
             )
