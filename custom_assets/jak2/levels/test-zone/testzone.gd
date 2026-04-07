@@ -4,7 +4,7 @@
 ;; the actual file name still needs to be 8.3
 ("TSZ.DGO"
  (
-  "mercenary.o"
+  "merc-slumc.o"
   "merc-darkeco-barrel-ag.go"
   "clock-blue-50s-ag.go"
   "clock-gold-90s-ag.go"

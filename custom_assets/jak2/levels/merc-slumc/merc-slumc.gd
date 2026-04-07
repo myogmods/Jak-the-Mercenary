@@ -5,7 +5,7 @@
 ("MSC.DGO"
  (
   "gun-buoy.o"
-  "mercenary.o"
+  "merc-slumc.o"
   "tpage-2869.go"
   "gun-buoy-ag.go"
   "transport-ag.go"
