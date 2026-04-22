@@ -25,6 +25,15 @@
       (set-setting-by-param *setting-control* 'fov #f (* 182.04445 94) 0) 
     )
 
+    (defun mod-override-init-position ((obj process-drawable) (arg0 entity-actor)) ;; Thanks barg :)
+      (case (-> obj name) :comp name=
+        (('burning-bush-13) ;; city-burning-bush-get-to-6 / burning-bush-markb-2
+          (set-vector-meters! (-> arg0 extra trans) 416.67   8.40   422.77)  ;; in tanker attack area
+          (set-vector! (-> arg0 quat)  0.00   0.99   0.00   -0.01))
+      )
+      (none)
+    )
+
     (defun runs-every-frame ()
       ;; (increase-power-cell-by-one) This is a call to increase-power-cell-by-one defined in mod-common-functions.gc
 
