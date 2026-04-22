@@ -822,9 +822,9 @@
             :name "city-burning-bush-get-to-6"
             :pre-play-node (game-task-node city-burning-bush-get-to-6-introduction)
             :kiosk-play-node (game-task-node city-burning-bush-get-to-6-resolution)
-            :pre-play-continue "ctymarkb-burning-bush-2"
+            :pre-play-continue "ctymarkb-burning-bush"
             :play-node (game-task-node city-burning-bush-get-to-6-resolution)
-            :play-continue "ctymarkb-burning-bush-2"
+            :play-continue "ctymarkb-burning-bush"
             :kiosk-play-continue #f
             )
           (new 'static 'game-task-info
@@ -1042,6 +1042,33 @@
             :pre-play-continue #f
             :play-node (game-task-node city-burning-bush-slumc-mercenary-resolution)
             :play-continue "ctyslumc-slums"
+            :kiosk-play-continue #f
+            )
+          (new 'static 'game-task-info
+            :name "city-burning-bush-genc-mercenary"
+            :pre-play-node (game-task-node city-burning-bush-genc-mercenary-introduction)
+            :kiosk-play-node (game-task-node city-burning-bush-genc-mercenary-resolution)
+            :pre-play-continue #f
+            :play-node (game-task-node city-burning-bush-genc-mercenary-resolution)
+            :play-continue "ctygenc-burning-bush-mercenary"
+            :kiosk-play-continue #f
+            )
+          (new 'static 'game-task-info
+            :name "city-burning-bush-markb-mercenary"
+            :pre-play-node (game-task-node city-burning-bush-markb-mercenary-introduction)
+            :kiosk-play-node (game-task-node city-burning-bush-markb-mercenary-resolution)
+            :pre-play-continue #f
+            :play-node (game-task-node city-burning-bush-markb-mercenary-resolution)
+            :play-continue "ctymarkb-burning-bush-mercenary"
+            :kiosk-play-continue #f
+            )
+          (new 'static 'game-task-info
+            :name "forest-burning-bush-forest-mercenary"
+            :pre-play-node (game-task-node forest-burning-bush-forest-mercenary-introduction)
+            :kiosk-play-node (game-task-node forest-burning-bush-forest-mercenary-resolution)
+            :pre-play-continue #f
+            :play-node (game-task-node forest-burning-bush-forest-mercenary-resolution)
+            :play-continue "forest-burning-bush-mercenary"
             :kiosk-play-continue #f
             )
           )
@@ -10537,7 +10564,7 @@
             :name "city-burning-bush-get-to-6-introduction"
             :when-open (new 'static 'boxed-array :type game-task-event
               (new 'static 'game-task-event
-                :actor (game-task-actor burning-bush-markb-2)
+                :actor (game-task-actor burning-bush-markb)
                 :action (game-task-action show)
                 :tex (game-task-icon gaticon-04)
                 :scene "bb31int"
@@ -10568,7 +10595,7 @@
             :name "city-burning-bush-get-to-6-resolution"
             :when-open (new 'static 'boxed-array :type game-task-event
               (new 'static 'game-task-event
-                :actor (game-task-actor burning-bush-markb-2)
+                :actor (game-task-actor burning-bush-markb)
                 :action (game-task-action play)
                 :tex (game-task-icon gaticon-06)
                 :scene #f
@@ -10587,7 +10614,7 @@
               :intro-scene #f
               :resolution-scene #f
               :resolution-scene-continue #f
-              :retry-continue "ctymarkb-burning-bush-2"
+              :retry-continue "ctymarkb-burning-bush"
               :fail-continue #f
               :init-hook #f
               :cleanup-hook #f
@@ -12387,6 +12414,225 @@
               :on-fail #f
               )
             :borrow '((ctywide 0 merc-slumc display))
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-genc-mercenary)
+            :name "city-burning-bush-genc-mercenary-introduction"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-genc-3)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-04)
+                :scene "bb16int"
+                )
+              (new 'static 'game-task-event
+                :actor (game-task-actor minimap)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-52)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag save-on-try)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node none) ;; (game-task-node city-protect-water-slums-resolution) add later
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? (lambda ((arg0 game-task-node-info)) (!= *kernel-boot-message* 'preview))
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-genc-mercenary)
+            :name "city-burning-bush-genc-mercenary-resolution"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-genc-3)
+                :action (game-task-action play)
+                :tex (game-task-icon gaticon-06)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag close-task save-on-life task-retry city-wait task-manager)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node city-burning-bush-genc-mercenary-introduction)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info (new 'static 'task-manager-info
+              :level 'merc-genc
+              :intro-scene #f
+              :resolution-scene #f
+              :resolution-scene-continue #f
+              :retry-continue "ctygenc-burning-bush-mercenary"
+              :fail-continue #f
+              :init-hook #f
+              :cleanup-hook #f
+              :update-hook #f
+              :code-hook #f
+              :complete-hook #f
+              :fail-hook #f
+              :event-hook #f
+              :final-node (game-task-node city-burning-bush-genc-mercenary-resolution)
+              :on-complete #f
+              :on-fail #f
+              )
+            :borrow '((ctywide 0 merc-genc display))
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-markb-mercenary)
+            :name "city-burning-bush-markb-mercenary-introduction"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-markb-2)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-04)
+                :scene "bb16int"
+                )
+              (new 'static 'game-task-event
+                :actor (game-task-actor minimap)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-52)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag save-on-try)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node none) ;; (game-task-node city-protect-water-slums-resolution) add later
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? (lambda ((arg0 game-task-node-info)) (!= *kernel-boot-message* 'preview))
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-markb-mercenary)
+            :name "city-burning-bush-markb-mercenary-resolution"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-markb-2)
+                :action (game-task-action play)
+                :tex (game-task-icon gaticon-06)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag close-task save-on-life task-retry city-wait task-manager)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node city-burning-bush-markb-mercenary-introduction)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info (new 'static 'task-manager-info
+              :level 'merc-markb
+              :intro-scene #f
+              :resolution-scene #f
+              :resolution-scene-continue #f
+              :retry-continue "ctymarkb-burning-bush-mercenary"
+              :fail-continue #f
+              :init-hook #f
+              :cleanup-hook #f
+              :update-hook #f
+              :code-hook #f
+              :complete-hook #f
+              :fail-hook #f
+              :event-hook #f
+              :final-node (game-task-node city-burning-bush-markb-mercenary-resolution)
+              :on-complete #f
+              :on-fail #f
+              )
+            :borrow '((ctywide 0 merc-markb display))
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'forest
+            :task (game-task forest-burning-bush-forest-mercenary)
+            :name "forest-burning-bush-forest-mercenary-introduction"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-forest)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-04)
+                :scene "bb16int"
+                )
+              (new 'static 'game-task-event
+                :actor (game-task-actor minimap)
+                :action (game-task-action show)
+                :tex (game-task-icon gaticon-52)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag save-on-try)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node none) ;; (game-task-node city-protect-water-slums-resolution) add later
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'forest
+            :task (game-task forest-burning-bush-forest-mercenary)
+            :name "forest-burning-bush-forest-mercenary-resolution"
+            :when-open (new 'static 'boxed-array :type game-task-event
+              (new 'static 'game-task-event
+                :actor (game-task-actor burning-bush-forest)
+                :action (game-task-action play)
+                :tex (game-task-icon gaticon-06)
+                :scene #f
+                )
+              )
+            :flags (game-task-node-flag close-task task-retry task-manager)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node forest-burning-bush-forest-mercenary-introduction)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info (new 'static 'task-manager-info
+              :level 'mercforest
+              :intro-scene #f
+              :resolution-scene #f
+              :resolution-scene-continue #f
+              :retry-continue "forest-burning-bush-mercenary"
+              :fail-continue "forest-burning-bush-mercenary"
+              :init-hook #f
+              :cleanup-hook #f
+              :update-hook #f
+              :code-hook #f
+              :complete-hook #f
+              :fail-hook #f
+              :event-hook #f
+              :final-node (game-task-node forest-burning-bush-forest-mercenary-resolution)
+              :on-complete '(begin (talker-spawn "bb01win") (apply ,(lambda () (send-event *target* 'get-pickup (pickup-type skill) (-> *FACT-bank* super-skill-inc))))) ;; og:preserve-this patched
+              :on-fail #f
+              )
+            :borrow '((forest 0 mercforest display))
             :open? #f
             :on-close #f
             )

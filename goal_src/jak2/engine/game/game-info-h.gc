@@ -121,6 +121,10 @@
   (reverse-race-1)
   (reverse-race-2)
   (reverse-race-3)
+  (merc-slumc) ;; custom entries for jak the mercenary mod 
+  (merc-genc)
+  (merc-markb)
+  (merc-forest)
   )
 
 (defenum highscore-flags

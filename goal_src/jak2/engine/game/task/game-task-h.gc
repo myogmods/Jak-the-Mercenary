@@ -121,7 +121,10 @@
   (stadium-burning-bush-race-class2-r 108)
   (stadium-burning-bush-race-class1-r 109)
   (city-burning-bush-slumc-mercenary 110)
-  (max 111))
+  (city-burning-bush-genc-mercenary 111)
+  (city-burning-bush-markb-mercenary 112)
+  (forest-burning-bush-forest-mercenary 113)
+  (max 114))
 ;; ---game-task
 
 ;; +++game-task-node
@@ -452,10 +455,15 @@
   (stadium-burning-bush-race-class2-r-resolution)
   (stadium-burning-bush-race-class1-r-introduction)
   (stadium-burning-bush-race-class1-r-resolution)
-  
   ;; custom entries
   (city-burning-bush-slumc-mercenary-introduction)
   (city-burning-bush-slumc-mercenary-resolution)
+  (city-burning-bush-genc-mercenary-introduction)
+  (city-burning-bush-genc-mercenary-resolution)
+  (city-burning-bush-markb-mercenary-introduction)
+  (city-burning-bush-markb-mercenary-resolution)
+  (forest-burning-bush-forest-mercenary-introduction)
+  (forest-burning-bush-forest-mercenary-resolution)
   )
 ;; ---game-task-node
 
