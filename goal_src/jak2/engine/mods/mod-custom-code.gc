@@ -37,13 +37,18 @@
     (defun runs-every-frame ()
       ;; (increase-power-cell-by-one) This is a call to increase-power-cell-by-one defined in mod-common-functions.gc
 
-      ;; Sample code to turn jak pink whenever he's doing the jetboard hover glitch
-      ;; (when *target* 
-      ;;   (if (board-hovering?)
-      ;;     (draw-pink *target*)
-      ;;     (draw-normal *target*)
+      ;; Failed attempt at getting past the onin tent problem in ctymarkb
+      ;; (cond 
+      ;;   ( (and (= (level-status *level* 'ctymarkb) 'active)                 ;; if in this level 
+      ;;          (in-bubble? (meters 482.31) (meters  8.40) (meters 473.04)   ;; location x y z 
+      ;;                      (meters 100.0)                                   ;; bubble size
+      ;;          )
+      ;;          (!= (level-status *level* 'extras-ctymarkb) 'active)         ;; if it's not loaded already     
       ;;     )
+      ;;     (script-eval '(want-load    'ctymarkb 'ctywide 'ctypal 'extras-ctymarkb))
+      ;;     (script-eval '(want-display 'extras-ctymarkb 'display))
       ;;   )
+      ;; )
 
       (if *show-input-display* 
         (input-display-on)
