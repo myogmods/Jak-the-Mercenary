@@ -159,13 +159,21 @@
     (sound-play "menu-pick")
     ;; Hide the actor immediately
     (logior! (-> self draw status) (draw-control-status no-draw))
-    ;; Draw "+90 seconds" text for 2 seconds
+    ;; Draw "+50 seconds" text for 2 seconds
     (set-time! (-> self state-time))
     (until (time-elapsed? (-> self state-time) (seconds 2))
-      (let ((font (new 'stack 'font-context *font-default-matrix* 0 65 0.0 (font-color green) (font-flags shadow kerning middle))))
-        (set-scale! font 0.9)
-        (print-game-text "+50 seconds" font #f 44 (bucket-id progress))
-        )
+      (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                   (bucket-id debug-no-zbuf1)
+                                  )
+                                  (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) 
+                                                                    (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1))
+                                  )
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 260 63 0.0 (font-color green) (font-flags shadow kerning middle large))))
+          (set! (-> font-ctx scale) 0.3)
+          (pc-encode-utf8-string (string-format "+50 seconds") *pc-encoded-temp-string*)
+          (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+          )
+      )
       (suspend)
       )
     (cleanup-for-death self)
@@ -297,10 +305,18 @@
     ;; Draw "+90 seconds" text for 2 seconds
     (set-time! (-> self state-time))
     (until (time-elapsed? (-> self state-time) (seconds 2))
-      (let ((font (new 'stack 'font-context *font-default-matrix* 0 65 0.0 (font-color green) (font-flags shadow kerning middle))))
-        (set-scale! font 0.9)
-        (print-game-text "+90 seconds" font #f 44 (bucket-id progress))
-        )
+      (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                   (bucket-id debug-no-zbuf1)
+                                  )
+                                  (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) 
+                                                                    (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1))
+                                  )
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 260 63 0.0 (font-color green) (font-flags shadow kerning middle large))))
+          (set! (-> font-ctx scale) 0.3)
+          (pc-encode-utf8-string (string-format "+90 seconds") *pc-encoded-temp-string*)
+          (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+          )
+      )
       (suspend)
       )
     (cleanup-for-death self)
@@ -359,6 +375,7 @@
   (vector-copy! (-> this base) (-> this root trans))
   (vector-copy! (-> this old-base) (-> this root trans))
   (initialize-skeleton this *merc-darkeco-barrel-sg* '())
+  (set-vector! (-> this root scale) 1.8 1.8 1.8 1.0)
   ;; (set-vector! (-> this draw color-mult) 1.0 0.0 1.0 1.0) ;; change colour 
   (set-vector! (-> this draw color-emissive) 0.25 0.25 0.25 1.0) ;; change colour
   (set! (-> this part) (create-launch-control group-darkjak-bomb this))
@@ -376,7 +393,7 @@
   (set! (-> self part) (create-launch-control group-darkjak-bomb self))
   (vector-copy! (-> self root trans) pos)
   (quaternion-identity! (-> self root quat))
-  (vector-identity! (-> self root scale))
+  (set-vector! (-> self root scale) 1.8 1.8 1.8 1.0)
   (set! (-> self bob-amount) 1024.0)
   (set! (-> self bob-offset)
         (+ (the int (-> self root trans x)) (the int (-> self root trans y)) (the int (-> self root trans z))))
@@ -415,6 +432,7 @@
             )
         ;; Start always at the barrel's root position
         (set! (-> start quad) (-> self root trans quad))
+        (+! (-> start y) (meters 4))
         ;; Raycast straight down from the barrel to find the ground
         (let ((cquery (new 'stack-no-clear 'collide-query)))
           (set! (-> cquery start-pos quad) (-> start quad))
@@ -465,6 +483,7 @@
     (sound-play "explosion")
     (let ((pos (new 'stack-no-clear 'vector)))
       (set! (-> pos quad) (-> self root trans quad))
+      (+! (-> pos y) (meters 2.5))  ;; raise explosion to center of barrel
       (part-tracker-spawn
         :to *entity-pool*
         :group group-dark-eco-box-explosion
@@ -852,7 +871,7 @@
   (send-event (handle->process (-> self slave 28)) 'hide-and-die)
   (send-event (handle->process (-> self slave 31)) 'hide-and-die)
   ;; Save highscore
-  (game-info-method-28 *game-info* (the-as game-score 8) (-> *game-info* score))
+  (game-info-method-28 *game-info* (game-score merc-slumc) (-> *game-info* score))
   ;; Despawn all transports
   (dotimes (i (length *merc-slumc-transport-info*))
            (when (handle->process (-> self slave i))
@@ -867,7 +886,7 @@
     (when *target* (logclear! (-> *target* mask) (process-mask target)))
   ;; Compute rank
   (let* ((kills       (the int (-> *game-info* score)))
-         (hi-score    (the int (-> (get-game-score-ref *game-info* 8) 0)))
+         (hi-score    (the int (-> (get-game-score-ref *game-info* (the-as int (game-score merc-slumc))) 0)))
          (rank-string (cond
                         ((>= kills 500) "Renegade")
                         ((>= kills 400) "Our Hero!")
@@ -894,7 +913,7 @@
       ;; RESULT line
       (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 50 0.0 (font-color red) (font-flags shadow kerning middle large))))
         (set! (-> font-ctx scale) 1.8)
-        (pc-encode-utf8-string (string-format "RESULT") *pc-encoded-temp-string*)
+        (pc-encode-utf8-string (string-format "Results") *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; High Score line
@@ -916,14 +935,14 @@
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; Retry? line
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 340 0.0 (font-color default) (font-flags shadow kerning middle large))))
-        (set! (-> font-ctx scale) 0.6)
-        (pc-encode-utf8-string (string-format "Retry?") *pc-encoded-temp-string*)
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 340 0.0 (font-color progress-old-yellow) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.7)
+        (pc-encode-utf8-string (string-format "Try Again?") *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; X = Yes, Δ = No line
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 370 0.0 (font-color default) (font-flags shadow kerning middle large))))
-        (set! (-> font-ctx scale) 0.6)
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 370 0.0 (font-color progress-old-yellow) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.7)
         (format (clear *temp-string*) "~S = Yes, ~S = No"
                 (lookup-text! *common-text* (text-id pad-x) #f)
                 (lookup-text! *common-text* (text-id pad-triangle) #f))
@@ -968,6 +987,9 @@
   )
   (none)
 )
+
+;; Variable to count previous score to play sound 
+(define *merc-prev-score* 0)
 
 (set-subtask-hook!
   *game-info*
@@ -1043,11 +1065,12 @@
       (send-event gp-0 'set-object-target-count (traffic-type carb) 0)
       (send-event gp-0 'set-object-target-count (traffic-type carc) 0)
       (send-event gp-0 'set-object-auto-activate (traffic-type crimson-guard-1) #f)
-      (send-event gp-0 'set-guard-target-count-range 0 10 10)
-      (send-event gp-0 'set-guard-target-count-range 1 10 10)
-      (send-event gp-0 'set-guard-target-count-range 2 10 10)
+      (send-event gp-0 'set-guard-target-count-range 0 8 8)
+      (send-event gp-0 'set-guard-target-count-range 1 12 12)
       (send-event gp-0 'set-guard-target-count-range 4 0 0)
       (send-event gp-0 'set-guard-target-count-range 5 0 0)
+      (set! (-> (-> *traffic-manager* traffic-engine) object-type-info-array (traffic-type crimson-guard-1) target-count) 20)
+      (set! (-> (-> *traffic-manager* traffic-engine) object-type-info-array (traffic-type crimson-guard-1) want-count) 20)
       )
     (speech-table-set! *speech-control* (speech-type speech-type-6) (new 'static 'speech-type-info
                                                                       :channel #x1
@@ -1069,7 +1092,6 @@
                                                                         "kg331a"
                                                                         "kg332a"
                                                                         "kg333a"
-                                                                        "kg334a"
                                                                         "kg335a"
                                                                         "kg336a"
                                                                         "kg337a"
@@ -1088,7 +1110,8 @@
     (dotimes (gp-1 (length *merc-slumc-transport-info*))
       (set! (-> *merc-slumc-transport-info* gp-1 spawned) #f)
       )
-    (set! *merc-kill-count* 0)
+    (set! *merc-kill-count* 0) ;; Counts dead guards
+    (set! *merc-prev-score* 0) ;; Variable to count previous score to play sound, setting to 0 here
     (set! *merc-tracking-active* #t)
     (set! (-> self data-int32 0) 0)  ;; mission transport dead completion flag
     (set! (-> self data-int32 1) 0)  ;; blocking plane spawned flag
@@ -1097,7 +1120,7 @@
     (set! (-> self data-int32 4) 0)  ;; prev dead guards
     (set! (-> self data-int32 6) 0)  ;; keep spawn transports flag
     (set! (-> *game-info* score) 0.0)
-    (set! (-> *game-info* goal) (-> (get-game-score-ref *game-info* 8) 0))
+    (set! (-> *game-info* goal) (-> (get-game-score-ref *game-info* (the-as int (game-score merc-slumc))) 0))
     (set! (-> self start-time) (-> *display* game-clock frame-counter))
     (set! (-> self time-limit) (seconds 120))
     (set! (-> self slave 27)
@@ -1140,9 +1163,6 @@
     (none)
     )
   )
-
-;; Variable to count previous score to play sound 
-(define *merc-prev-score* 0)
 
 (set-subtask-hook!
   *game-info*
@@ -1203,7 +1223,7 @@
       (set! *merc-prev-score* *merc-kill-count*)
       )
     ;; Update hud-goal with highscore
-    (let ((hi-ref (get-game-score-ref *game-info* 8)))
+    (let ((hi-ref (get-game-score-ref *game-info* (the-as int (game-score merc-slumc)))))
       (if (>= (-> *game-info* score) (-> hi-ref 0))
           (set! (-> *game-info* goal) (-> *game-info* score))
           (set! (-> *game-info* goal) (-> hi-ref 0))
