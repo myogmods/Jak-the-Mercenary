@@ -167,7 +167,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1000",
-        "eco-info": ["eco-info", "(pickup-type ammo-random)", 4]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 40]
       }
     },
     {
@@ -191,7 +191,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1002",
-        "eco-info": ["eco-info", "(pickup-type ammo-random)", 4]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 40]
       }
     },
     {
@@ -227,7 +227,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1005",
-        "eco-info": ["eco-info", "(pickup-type ammo-random)", 6]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 60]
       }
     },
     {
@@ -251,7 +251,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1007",
-        "eco-info": ["eco-info", "(pickup-type ammo-random)", 6]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 60]
       }
     },
     {
@@ -263,7 +263,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1008",
-        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 4]
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 40]
       }
     },
     {
@@ -287,7 +287,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1010",
-        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 4]
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 40]
       }
     },
     {
@@ -311,7 +311,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1012",
-        "eco-info": ["eco-info", "(pickup-type ammo-random)", 6]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 60]
       }
     },
     {
@@ -345,7 +345,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1014",
-        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 4]
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 40]
       }
     },
     {
@@ -357,7 +357,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1015",
-        "eco-info": ["eco-info", "(pickup-type ammo-random)", 6]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 60]
       }
     },
     {
@@ -381,7 +381,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1017",
-        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 4]
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 40]
       }
     },
     {
@@ -417,7 +417,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1020",
-        "eco-info": ["eco-info", "(pickup-type ammo-yellow)", 4]
+        "eco-info": ["eco-info", "(pickup-type ammo-yellow)", 40]
       }
     },
     {
@@ -453,7 +453,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1023",
-        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 3]
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 30]
       }
     },
     {
@@ -465,7 +465,7 @@
       "bsphere": [-3.7209, 1.0473, 29.9281, 10],
       "lump": {
         "name": "crate-1024",
-        "eco-info": ["eco-info", "(pickup-type ammo-random)", 8]
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 40]
       }
     },
     {

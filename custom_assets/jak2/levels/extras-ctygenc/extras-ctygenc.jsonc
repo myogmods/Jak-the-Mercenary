@@ -51,17 +51,16 @@
                 ],
 
   "actors" : [
-    // replace this with real one later
-    // {
-    //   "trans": [764.47,   8.12, -727.98], // translation
-    //   "etype": "burning-bush",  // actor type
-    //   "game_task": 0, // associated game task (for powercells, etc)
-    //   "quat" : [0.00,  -0.09,   0.00,  -0.99], // rotation
-    //   "bsphere": [-2.70, 3.50, 64, 10], // bounding sphere
-    //   "lump": {
-    //     "name":"burning-bush-69",
-    //     "task-actor": ["int32", 68]
-    //   }
-    // }
+    {
+      "trans": [75.44,   7.99, 329.87], // translation
+      "etype": "burning-bush",  // actor type
+      "game_task": 0, // associated game task (for powercells, etc)
+      "quat" : [0.00,  -0.70,  -0.00,  -0.70], // rotation
+      "bsphere": [-2.70, 3.50, 64, 10], // bounding sphere
+      "lump": {
+        "name":"burning-bush-70",
+        "task-actor": ["int32", 69]
+      }
+    }
   ]
 }

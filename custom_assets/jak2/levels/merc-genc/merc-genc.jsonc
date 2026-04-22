@@ -1,0 +1,589 @@
+{
+  // The "in-game" name of the level. Should be lower case, with dashes (GOAL symbol name)
+  // the name of this file, and the folder this file is in must have the same name AND be 10 characters of less.
+  "long_name": "merc-genc",
+  // The file name, should be upper case and 8 characters or less.
+  "iso_name": "MGC",
+  // The nickname, should be exactly 3 characters
+  "nickname": "mgc", // 3 char name, all lowercase
+  // Background mesh file.
+  // Must have vertex colors. Use the blender cycles renderer, bake, diffuse, uncheck color,
+  // and bake to vertex colors. For now, only the first vertex color group is used, so make sure you
+  // only have 1.
+  "gltf_file": "custom_assets/jak2/levels/merc-genc/merc-genc.glb",
+
+  // automatically set wall vs. ground based on angle. Useful if you don't want to assign this yourself
+  "automatic_wall_detection": true,
+  "automatic_wall_angle": 45.0,
+
+  // if your mesh has triangles with incorrect orientation, set this to make all collision mesh triangles double sided
+  // this makes collision 2x slower and bigger, so only use if really needed
+  "double_sided_collide": false,
+
+  // available res-lump tag data types:
+  // int32, float, meters, vector, vector4m (meters)
+  //
+  // examples:
+  //
+  // adds a float tag 'spring-height' with value of 200 meters (1 meter = 4096.0 units):
+  // "spring-height": ["meters", 200.0]
+  //
+  // adds a vector tag 'movie-pos':
+  // "movie-pos": ["vector", [4096000.0, -176128.0, 1353973.76, 1.0]]
+
+   // The base actor id for your custom level. If you have multiple levels, this should be unique!
+   "base_id": 200,
+
+  // All art groups you want to use in your custom level. Will add their models and corresponding textures to the FR3 file.
+  // Removed so that the release builds don't have to double-decompile the game
+  //"art_groups": ["prsn-torture-ag"],
+  "art_groups":   [
+                  "transport-ag"
+                  ],
+
+  // If you have any custom models in the "custom_assets/jak2/models/custom_levels" folder that you want to use in your level, add them to this list.
+  // Note: Like with art groups, these should also be added to your level's .gd file.
+  "custom_models": [
+                   "merc-darkeco-barrel",
+                   "clock-green-30s",
+                   "clock-blue-50s",
+                   "clock-gold-90s"
+                   ],
+
+   // Any textures you want to include in your custom level.
+   // This is mainly useful for textures which are not in the common level files and have no art group associated with them.
+   // To get a list of all the textures, you can extract all of the game's textures
+   // by setting "save_texture_pngs" to true in the decompiler config.
+   "textures":  [
+
+                ],
+
+  "actors" : [
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////// EXTRA TIME CLOCKS ///////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    {
+      "trans": [24.00,  11.77, 350.611],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [-0.00,   0.55,   0.00,   0.83],
+      "bsphere": [24.00,  11.77, 350.61, 10],
+      "lump": {
+        "name": "clock-green-30s-1"
+      }
+    },
+    {
+      "trans": [24.00,  11.77, 207.241],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [0.00,  -0.51,   0.00,  -0.86],
+      "bsphere": [24.00,  11.77, 207.24, 10],
+      "lump": {
+        "name": "clock-green-30s-2"
+      }
+    },
+    {
+      "trans": [24.13,  11.77, 71.70],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [0.00,  -0.51,   0.00,  -0.86],
+      "bsphere": [24.00,  11.77, 71.70, 10],
+      "lump": {
+        "name": "clock-green-30s-3"
+      }
+    },
+    {
+      "trans": [354.46,  11.77,  67.42],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [0.00,  -0.51,   0.00,  -0.86],
+      "bsphere": [24.00,  11.77, 71.70, 10],
+      "lump": {
+        "name": "clock-green-30s-4"
+      }
+    },
+    {
+      "trans": [354.46,   11.77, 212.25],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [-0.00,  -0.69,  -0.00,   0.71],
+      "bsphere": [354.46,   11.77, 212.25, 10],
+      "lump": {
+        "name": "clock-green-30s-5"
+      }
+    },
+    {
+      "trans": [354.46,   11.77, 362.29],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [0.00,   0.73,   0.00,  -0.67],
+      "bsphere": [354.46,   11.77, 362.29, 10],
+      "lump": {
+        "name": "clock-green-30s-6"
+      }
+    },
+
+    {
+      "trans": [191.83,  15.61, 200.371],
+      "etype": "clock-blue-50s",
+      "game_task": 0,
+      "quat" : [-0.00,   -0.91,  -0.00,   0.41],
+      "bsphere": [191.83,  15.61, 200.37, 10],
+      "lump": {
+        "name": "clock-blue-50s-4"
+      }
+    },
+    {
+      "trans": [242.34,  12.17, 124.50],
+      "etype": "clock-blue-50s",
+      "game_task": 0,
+      "quat" : [-0.00,  -0.60,   0.00,   0.79],
+      "bsphere": [242.34,  12.17, 124.50, 10],
+      "lump": {
+        "name": "clock-blue-50s-5"
+      }
+    },
+    {
+      "trans": [141.59,  12.17, 124.50],
+      "etype": "clock-blue-50s",
+      "game_task": 0,
+      "quat" : [-0.00,  -0.72,  -0.00,   0.69],
+      "bsphere": [141.59,  12.17, 124.50, 10],
+      "lump": {
+        "name": "clock-blue-50s-6"
+      }
+    },
+
+    {
+      "trans": [192.14,  16.48, 381.871],
+      "etype": "clock-gold-90s",
+      "game_task": 0,
+      "quat" : [0, 0, 0, 1],
+      "bsphere": [191.99,  16.48, 381.87, 10],
+      "lump": {
+        "name": "clock-gold-90s-4"
+      }
+    },
+    {
+      "trans": [192.14,  11.44,  15.95],
+      "etype": "clock-gold-90s",
+      "game_task": 0,
+      "quat" : [0, 0, 0, 1],
+      "bsphere": [192.14,  11.44,  15.95, 10],
+      "lump": {
+        "name": "clock-gold-90s-5"
+      }
+    },
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////// CRATES & DARKECO BARRELS ////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+    {
+      "trans": [12.47,   7.99, 190.56],
+      "etype": "merc-darkeco-barrel",
+      "game_task": 0,
+      "quat" : [0, 0, 0, 1],
+      "bsphere": [-0.71, 30.31, 29.74, 10],
+      "lump": {
+        "name": "merc-darkeco-barrel-4"
+      }
+    },
+    {
+      "trans": [195.70,  11.99, 150.28],
+      "etype": "merc-darkeco-barrel",
+      "game_task": 0,
+      "quat" : [0, 0, 0, 1],
+      "bsphere": [-0.71, 30.31, 29.74, 10],
+      "lump": {
+        "name": "merc-darkeco-barrel-5"
+      }
+    },
+    {
+      "trans": [235.19,   7.99, 360.43],
+      "etype": "merc-darkeco-barrel",
+      "game_task": 0,
+      "quat" : [0, 0, 0, 1],
+      "bsphere": [235.19,   7.99, 360.43, 10],
+      "lump": {
+        "name": "merc-darkeco-barrel-6"
+      }
+    },
+
+    {
+      "trans": [199.37,  11.99, 149.51],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,   0.72,  -0.00,   0.69],
+      "bsphere": [-3.7209, 1.0473, 29.9281, 10],
+      "lump": {
+        "name": "crate-1050",
+        "eco-info": ["eco-info", "(pickup-type ammo-yellow)", 40]
+      }
+    },
+    {
+      "trans": [191.85,  11.99, 147.50],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,   0.99,   0.00,  -0.09],
+      "bsphere": [-3.7209, 1.0473, 29.9281, 10],
+      "lump": {
+        "name": "crate-1051",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [10.97,   8.00, 193.34],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.95,  -0.00,  -0.29],
+      "bsphere": [-3.7209, 1.0473, 29.9281, 10],
+      "lump": {
+        "name": "crate-1052",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 30]
+      }
+    },
+    {
+      "trans": [15.03,   8.00, 192.99],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.62,   0.00,   0.77],
+      "bsphere": [-3.7209, 1.0473, 29.9281, 10],
+      "lump": {
+        "name": "crate-1053",
+        "eco-info": ["eco-info", "(pickup-type ammo-dark)", 4]
+      }
+    },
+    {
+      "trans": [59.42,   7.99,  57.87],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,   0.87,   0.00,  -0.48],
+      "bsphere": [59.42,   7.99,  57.87, 10],
+      "lump": {
+        "name": "crate-1054",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 40]
+      }
+    },
+    {
+      "trans": [60.21,   7.99,  60.37],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,   0.45,   0.00,  -0.88],
+      "bsphere": [59.42,   7.99,  57.87, 10],
+      "lump": {
+        "name": "crate-1055",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [53.59,   8.00,  56.17],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.04,   0.00,   0.99],
+      "bsphere": [53.59,   8.70,  56.17, 10],
+      "lump": {
+        "name": "crate-1056",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 40]
+      }
+    },
+    {
+      "trans": [218.06,   8.00,   6.46],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,   0.75,   0.00,   0.65],
+      "bsphere": [218.06,   8.00,   6.46, 10],
+      "lump": {
+        "name": "crate-1056",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 40]
+      }
+    },
+    {
+      "trans": [214.81,   8.00,   7.99],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.72,   0.00,   0.68],
+      "bsphere": [214.81,   8.00,   7.99, 10],
+      "lump": {
+        "name": "crate-1057",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [340.87,   7.99, 130.75],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.07,   0.00,   0.99],
+      "bsphere": [340.87,   7.99, 130.75, 10],
+      "lump": {
+        "name": "crate-1058",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [341.30,   7.99, 127.54],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.98,   0.00,   0.17],
+      "bsphere": [341.30,   7.99, 127.54, 10],
+      "lump": {
+        "name": "crate-1059",
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 40]
+      }
+    },
+    {
+      "trans": [330.63,   7.99, 234.24],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,  -0.40,  -0.00,  -0.91],
+      "bsphere": [330.63,   7.99, 234.24, 10],
+      "lump": {
+        "name": "crate-1060",
+        "eco-info": ["eco-info", "(pickup-type ammo-yellow)", 40]
+      }
+    },
+    {
+      "trans": [326.68,   7.99, 232.81],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.95,  -0.00,   0.29],
+      "bsphere": [326.68,   7.99, 232.81, 10],
+      "lump": {
+        "name": "crate-1061",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [326.68,   7.99, 232.81],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.95,  -0.00,   0.29],
+      "bsphere": [326.68,   7.99, 232.81, 10],
+      "lump": {
+        "name": "crate-1061",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [186.30,  11.99, 185.19],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.00,  -0.00,  -1.00],
+      "bsphere": [186.30,  11.99, 185.19, 10],
+      "lump": {
+        "name": "crate-1062",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [189.30,  11.99, 185.19],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.00,  -0.00,  -1.00],
+      "bsphere": [189.30,  11.99, 185.19, 10],
+      "lump": {
+        "name": "crate-1063",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [192.30,  11.99, 185.19],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.00,  -0.00,  -1.00],
+      "bsphere": [192.30,  11.99, 185.19, 10],
+      "lump": {
+        "name": "crate-1064",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [195.30,  11.99, 185.19],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.00,  -0.00,  -1.00],
+      "bsphere": [195.30,  11.99, 185.19, 10],
+      "lump": {
+        "name": "crate-1065",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [198.30,  11.99, 185.19],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.00,  -0.00,  -1.00],
+      "bsphere": [198.30,  11.99, 185.19, 10],
+      "lump": {
+        "name": "crate-1066",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [201.30,  11.99, 185.19],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [0.00,  -0.00,  -0.00,  -1.00],
+      "bsphere": [201.30,  11.99, 185.19, 10],
+      "lump": {
+        "name": "crate-1067",
+        "eco-info": ["eco-info", "(pickup-type ammo-yellow)", 40]
+      }
+    },
+
+    {
+      "trans": [186.30,  11.99, 213.89],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [186.30,  11.99, 213.89, 10],
+      "lump": {
+        "name": "crate-1068",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [189.30,  11.99, 213.89],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [189.30,  11.99, 213.89, 10],
+      "lump": {
+        "name": "crate-1069",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [192.30,  11.99, 213.89],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [192.30,  11.99, 213.89, 10],
+      "lump": {
+        "name": "crate-1070",
+        "eco-info": ["eco-info", "(pickup-type ammo-random)", 20]
+      }
+    },
+    {
+      "trans": [195.30,  11.99, 213.89],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [195.30,  11.99, 213.89, 10],
+      "lump": {
+        "name": "crate-1071",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [198.30,  11.99, 213.89],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [198.30,  11.99, 213.89, 10],
+      "lump": {
+        "name": "crate-1072",
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 20]
+      }
+    },
+    {
+      "trans": [201.30,  11.99, 213.89],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [201.30,  11.99, 213.89, 10],
+      "lump": {
+        "name": "crate-1073",
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 40]
+      }
+    },
+
+    {
+      "trans": [231.81,   7.99, 361.78],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [231.81,   7.99, 361.78, 10],
+      "lump": {
+        "name": "crate-1074",
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 40]
+      }
+    },
+    {
+      "trans": [228.81,   7.99, 361.78],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [228.81,   7.99, 361.78, 10],
+      "lump": {
+        "name": "crate-1075",
+        "eco-info": ["eco-info", "(pickup-type ammo-red)", 40]
+      }
+    },
+    {
+      "trans": [228.81,   7.99, 358.78],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [228.81,   7.99, 358.78, 10],
+      "lump": {
+        "name": "crate-1076",
+        "eco-info": ["eco-info", "(pickup-type health)", 2]
+      }
+    },
+    {
+      "trans": [231.81,   7.99, 358.78],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.99,   0.00,   0.00],
+      "bsphere": [231.81,   7.99, 358.78, 10],
+      "lump": {
+        "name": "crate-1077",
+        "eco-info": ["eco-info", "(pickup-type ammo-yellow)", 40]
+      }
+    },
+
+    {
+      "trans": [196.02,  11.99, 146.22],
+      "etype": "crate",
+      "game_task": 0,
+      "kill_mask": 0,
+      "quat": [-0.00,   0.44,   0.00,   0.89],
+      "bsphere": [-3.7209, 1.0473, 29.9281, 10],
+      "lump": {
+        "name": "crate-1078",
+        "eco-info": ["eco-info", "(pickup-type ammo-blue)", 20]
+      }
+    }
+  ]
+}

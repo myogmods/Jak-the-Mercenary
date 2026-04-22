@@ -311,10 +311,6 @@
 (goal-src "levels/extras-ctygenc/extras-ctygenc.gc" "process-focusable")
 (custom-level-cgo "EGC.DGO" "extras-ctygenc/extras-ctygenc.gd")
 
-(build-custom-level "extras-ctymarkb")
-(goal-src "levels/extras-ctymarkb/extras-ctymarkb.gc" "process-focusable")
-(custom-level-cgo "EMB.DGO" "extras-ctymarkb/extras-ctymarkb.gd")
-
 (build-custom-level "extras-forest")
 (goal-src "levels/extras-forest/extras-forest.gc" "process-focusable")
 (custom-level-cgo "EFO.DGO" "extras-forest/extras-forest.gd")
@@ -322,6 +318,18 @@
 (build-custom-level "merc-slumc")
 (goal-src "levels/merc-slumc/merc-slumc.gc" "process-focusable")
 (custom-level-cgo "MSC.DGO" "merc-slumc/merc-slumc.gd")
+
+(build-custom-level "merc-genc")
+(goal-src "levels/merc-genc/merc-genc.gc" "process-focusable")
+(custom-level-cgo "MGC.DGO" "merc-genc/merc-genc.gd")
+
+(build-custom-level "merc-markb")
+(goal-src "levels/merc-markb/merc-markb.gc" "process-focusable")
+(custom-level-cgo "MMB.DGO" "merc-markb/merc-markb.gd")
+
+(build-custom-level "mercforest")
+(goal-src "levels/mercforest/mercforest.gc" "process-focusable")
+(custom-level-cgo "MFO.DGO" "mercforest/mercforest.gd")
 
 ;; generate the art group for a custom actor.
 ;; requires a .glb model file in custom_assets/jak2/models/custom_levels

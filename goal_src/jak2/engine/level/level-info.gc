@@ -5368,6 +5368,30 @@
           )
         :want-sound (new 'static 'array symbol 3 'forest1 'forest2 'forest3)
         )
+      (new 'static 'continue-point
+        :name "forest-burning-bush-mercenary"
+        :level 'forest
+        :flags (continue-flags test)
+        :trans (new 'static 'vector :x (meters -740.37) :y (meters  36.35) :z (meters 831.74) :w 1.0)
+        :quat (new 'static 'vector :x 0.0001 :y 0.3242 :z -0.0013 :w 0.9459)
+        :camera-trans (new 'static 'vector :x -2642006.0 :y 171092.78 :z 3519268.5 :w 1.0)
+        :camera-rot (new 'static 'inline-array vector3s 3
+          (new 'static 'vector3s :data (new 'static 'array float 3 0.815 0.0 -0.5794))
+          (new 'static 'vector3s :data (new 'static 'array float 3 0.0703 0.9925 0.099))
+          (new 'static 'vector3s :data (new 'static 'array float 3 0.5751 -0.1214 0.809))
+          )
+        :on-goto #f
+        :vis-nick 'forest
+        :want (new 'static 'inline-array level-buffer-state 6
+          (new 'static 'level-buffer-state :name 'forest :display? 'display :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name 'forestb :display? 'display :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name #f :display? #f :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name #f :display? #f :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name #f :display? #f :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name #f :display? #f :force-vis? #f :force-inside? #f)
+          )
+        :want-sound (new 'static 'array symbol 3 'forest1 'forest2 'forest3)
+        )
       )
     :tasks '()
     :priority 100
@@ -6239,6 +6263,30 @@
           (new 'static 'vector3s :data (new 'static 'array float 3 0.0167 0.0 -0.9998))
           (new 'static 'vector3s :data (new 'static 'array float 3 0.1206 0.9926 0.002))
           (new 'static 'vector3s :data (new 'static 'array float 3 0.9925 -0.1206 0.0166))
+          )
+        :on-goto #f
+        :vis-nick 'ctygenc
+        :want (new 'static 'inline-array level-buffer-state 6
+          (new 'static 'level-buffer-state :name 'ctygenc :display? 'display :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name 'ctywide :display? 'display :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name #f :display? #f :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name 'ctypal :display? 'display :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name #f :display? #f :force-vis? #f :force-inside? #f)
+          (new 'static 'level-buffer-state :name #f :display? #f :force-vis? #f :force-inside? #f)
+          )
+        :want-sound (new 'static 'array symbol 3 'ctywide1 'ctywide2 'ctywide3)
+        )
+      (new 'static 'continue-point
+        :name "ctygenc-burning-bush-mercenary"
+        :level 'ctygenc
+        :flags (continue-flags no-auto)
+        :trans (new 'static 'vector :x (meters 80.3210) :y (meters 7.9987) :z (meters 330.9970) :w 1.0)
+        :quat (new 'static 'vector :x -0.0001 :y 0.9990 :z -0.0000 :w -0.0446)
+        :camera-trans (new 'static 'vector :x (meters 81.2919) :y (meters 12.8553) :z (meters 342.3620) :w 1.0)
+        :camera-rot (new 'static 'inline-array vector3s 3
+          (new 'static 'vector3s :data (new 'static 'array float 3 -0.9963 -0.0000 0.0855))
+          (new 'static 'vector3s :data (new 'static 'array float 3 -0.0102 0.9927 -0.1197))
+          (new 'static 'vector3s :data (new 'static 'array float 3 -0.0849 -0.1201 -0.9891))
           )
         :on-goto #f
         :vis-nick 'ctygenc
@@ -8352,16 +8400,16 @@
         :want-sound (new 'static 'array symbol 3 'ctywide1 'ctywide2 'ctywide3)
         )
       (new 'static 'continue-point
-        :name "ctymarkb-burning-bush-2"
+        :name "ctymarkb-burning-bush-mercenary"
         :level 'ctymarkb
         :flags (continue-flags no-auto)
-        :trans (new 'static 'vector :x 2575240.5 :y 34444.902 :z 3103047.2 :w 1.0)
-        :quat (new 'static 'vector :y 0.0787 :w 0.9968)
-        :camera-trans (new 'static 'vector :x 2563072.0 :y 54984.293 :z 3055447.2 :w 1.0)
+        :trans (new 'static 'vector :x (meters 416.92) :y (meters   8.40) :z (meters 426.53) :w 1.0)
+        :quat (new 'static 'vector :x -0.0001 :y 0.9990 :z -0.0000 :w -0.0446)
+        :camera-trans (new 'static 'vector :x (meters 81.2919) :y (meters 12.8553) :z (meters 342.3620) :w 1.0)
         :camera-rot (new 'static 'inline-array vector3s 3
-          (new 'static 'vector3s :data (new 'static 'array float 3 0.9676 0.0 -0.2522))
-          (new 'static 'vector3s :data (new 'static 'array float 3 0.0305 0.9926 0.1173))
-          (new 'static 'vector3s :data (new 'static 'array float 3 0.2503 -0.1212 0.9605))
+          (new 'static 'vector3s :data (new 'static 'array float 3 -0.9963 -0.0000 0.0855))
+          (new 'static 'vector3s :data (new 'static 'array float 3 -0.0102 0.9927 -0.1197))
+          (new 'static 'vector3s :data (new 'static 'array float 3 -0.0849 -0.1201 -0.9891))
           )
         :on-goto #f
         :vis-nick 'ctymarkb
@@ -8388,9 +8436,9 @@
     :activate-func 'market-activate
     :deactivate-func #f
     :kill-func #f
-    :borrow-size (new 'static 'array uint16 2 160 160)
-    :borrow-level (new 'static 'array symbol 2 #f 'extras-ctymarkb)
-    :borrow-display? (new 'static 'array symbol 2 #f 'display)
+    ;; :borrow-size (new 'static 'array uint16 2 160 160)
+    :borrow-level (new 'static 'array symbol 2 #f #f)
+    :borrow-display? (new 'static 'array symbol 2 #f #f)
     :texture-anim-tfrag #f
     :texture-anim-pris #f
     :texture-anim-shrub #f
@@ -15861,9 +15909,17 @@
                    :max-rain 1.0
                    :fog-mult 1.0
                    :ocean-alpha 1.0
-                   :extra-sound-bank #f ;; '((ctywide3 lprotect))
+                   :extra-sound-bank #f
                    )
         )
+
+(define merc-genc (new 'static 'level-load-info
+                   :index #xA0
+                   :task-level #x1
+                   :name 'merc-genc
+                   :visname 'merc-genc-vis
+                   :nickname 'mgc
+                   :dbname 'merc-genc
                    :taskname 'city
                    :packages '(gun-buoyp protectp)
                    :memory-mode (load-buffer-mode borrow)
@@ -15908,7 +15964,117 @@
                    :max-rain 1.0
                    :fog-mult 1.0
                    :ocean-alpha 1.0
-                   :extra-sound-bank #f ;; '((ctywide3 lprotect))
+                   :extra-sound-bank #f
+                   )
+        )
+
+(define merc-markb (new 'static 'level-load-info
+                   :index #xA1
+                   :task-level #x1
+                   :name 'merc-markb
+                   :visname 'merc-markb-vis
+                   :nickname 'mmb
+                   :dbname 'merc-markb
+                   :taskname 'city
+                   :packages '(gun-buoyp protectp)
+                   :memory-mode (load-buffer-mode borrow)
+                   :music-bank #f
+                   :ambient-sounds '()
+                   :mood-func 'update-mood-copy-ctywide
+                   :mood-init #f
+                   :ocean #f
+                   :sky #f
+                   :use-camera-other #f
+                   :continues '()
+                   :tasks '()
+                   :priority 100
+                   :load-commands '()
+                   :alt-load-commands '()
+                   :bsp-mask #xffffffffffffffff
+                   :buttom-height (meters -20)
+                   :run-packages '("common")
+                   :wait-for-load #f
+                   :login-func #f
+                   :activate-func #f
+                   :deactivate-func #f
+                   :kill-func #f
+                   :borrow-level (new 'static 'array symbol 2 #f #f)
+                   :borrow-display? (new 'static 'array symbol 2 #f #f)
+                   :texture-anim-tfrag #f
+                   :texture-anim-pris #f
+                   :texture-anim-shrub #f
+                   :texture-anim-alpha #f
+                   :texture-anim-water #f
+                   :texture-anim-twarp #f
+                   :texture-anim-pris2 #f
+                   :texture-anim-sprite #f
+                   :texture-anim-map #f
+                   :texture-anim-sky #f
+                   :draw-priority 10.0
+                   :fog-height 327680.0
+                   :bigmap-id (bigmap-id city)
+                   :ocean-near-translucent? #t
+                   :ocean-far? #f
+                   :mood-range (new 'static 'mood-range :data (new 'static 'array float 4 0.0 1.0 0.0 1.0))
+                   :max-rain 1.0
+                   :fog-mult 1.0
+                   :ocean-alpha 1.0
+                   :extra-sound-bank #f
+                   )
+        )
+
+(define mercforest (new 'static 'level-load-info
+                   :index #xA2
+                   :task-level #x9
+                   :name 'mercforest
+                   :visname 'mercforest-vis
+                   :nickname 'mfo
+                   :dbname 'mercforest
+                   :taskname 'forest
+                   :packages '()
+                   :memory-mode (load-buffer-mode borrow)
+                   :music-bank #f
+                   :ambient-sounds '()
+                   :mood-func 'update-mood-forest
+                   :mood-init #f
+                   :ocean #f
+                   :sky #f
+                   :use-camera-other #f
+                   :continues '()
+                   :tasks '()
+                   :priority 100
+                   :load-commands '()
+                   :alt-load-commands '()
+                   :bsp-mask #xffffffffffffffff
+                   :buttom-height (meters -20)
+                   :run-packages '("common")
+                   :wait-for-load #f
+                   :login-func #f
+                   :activate-func #f
+                   :deactivate-func #f
+                   :kill-func #f
+                   :borrow-level (new 'static 'array symbol 2 #f #f)
+                   :borrow-display? (new 'static 'array symbol 2 #f #f)
+                   :texture-anim-tfrag #f
+                   :texture-anim-pris #f
+                   :texture-anim-shrub #f
+                   :texture-anim-alpha #f
+                   :texture-anim-water #f
+                   :texture-anim-twarp #f
+                   :texture-anim-pris2 #f
+                   :texture-anim-sprite #f
+                   :texture-anim-map #f
+                   :texture-anim-sky #f
+                   :draw-priority 10.0
+                   :fog-height 327680.0
+                   :bigmap-id (bigmap-id forest)
+                   :ocean-near-translucent? #t
+                   :ocean-far? #f
+                   :mood-range (new 'static 'mood-range :data (new 'static 'array float 4 0.0 1.0 0.0 1.0))
+                   :max-rain 1.0
+                   :fog-mult 1.0
+                   :ocean-alpha 1.0
+                   :extra-sound-bank #f
                    )
         )
 
@@ -15976,16 +16142,17 @@
  `(extras-level ,index ,name ,visname ,nick ,mood-func borrow)
   )
 
-(define extras-ctyslumc        (extras-borrow-level #xA0 'extras-ctyslumc        'extras-ctyslumc-vis        'esc 'update-mood-ctyslumc))
-(define extras-ctygenc         (extras-borrow-level #xA1 'extras-ctygenc         'extras-ctygenc-vis         'egc 'update-mood-copy-ctywide))
-(define extras-ctymarkb        (extras-borrow-level #xA2 'extras-ctymarkb        'extras-ctymarkb-vis        'emb 'update-mood-ctymarkb))
-(define extras-forest          (extras-borrow-level #xA3 'extras-forest          'extras-forest-vis          'efo 'update-mood-forest))
+(define extras-ctyslumc        (extras-borrow-level #xA3 'extras-ctyslumc        'extras-ctyslumc-vis        'esc 'update-mood-ctyslumc))
+(define extras-ctygenc         (extras-borrow-level #xA4 'extras-ctygenc         'extras-ctygenc-vis         'egc 'update-mood-copy-ctywide))
+(define extras-forest          (extras-borrow-level #xA6 'extras-forest          'extras-forest-vis          'efo 'update-mood-forest))
 
 (#when PC_PORT
   (cons! *level-load-list* 'test-zone)
   (cons! *level-load-list* 'extras-ctyslumc)
   (cons! *level-load-list* 'extras-ctygenc)
-  (cons! *level-load-list* 'extras-ctymarkb)
   (cons! *level-load-list* 'extras-forest)
   (cons! *level-load-list* 'merc-slumc)
+  (cons! *level-load-list* 'merc-genc)
+  (cons! *level-load-list* 'merc-markb)
+  (cons! *level-load-list* 'mercforest)
   )

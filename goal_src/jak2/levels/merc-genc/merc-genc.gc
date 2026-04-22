@@ -1,0 +1,1583 @@
+;;-*-Lisp-*-
+(in-package goal)
+
+(defpartgroup group-mercenary-clock-spark
+  :id 1295
+  :flags (use-local-clock)
+  :bounds (static-bspherem 0 0 0 5)
+  :parts ((sp-item 5488 :period (seconds 1.5) :length (seconds 0.067))
+    (sp-item 5488 :period (seconds 1.5) :length (seconds 0.067) :offset 200)
+    (sp-item 5488 :period (seconds 1.5) :length (seconds 0.067) :offset 300)
+    (sp-item 5488 :period (seconds 1.5) :length (seconds 0.067) :offset 400)
+    )
+  )
+
+(defpart 5488
+  :init-specs ((:texture (hotdot effects))
+    (:num 8.0)
+    (:x (meters 0))
+    (:y (meters 0))
+    (:z (meters 0))
+    (:scale-x (meters 1))
+    (:scale-y (meters 0.065) (meters 0.065))
+    (:r 255.0)
+    (:g 255.0)
+    (:b 255.0)
+    (:a 64.0 32.0)
+    (:omega (degrees 0.045) (degrees 0.0225))
+    (:vel-y (meters 0.06666667) (meters 0.13333334))
+    (:accel-y (meters -0.0016666667) (meters -0.0033333334))
+    (:friction 0.9 0.02)
+    (:timer (seconds 0.167) (seconds 0.497))
+    (:flags (sp-cpuinfo-flag-2 sp-cpuinfo-flag-3))
+    (:func 'sparticle-motion-blur)
+    (:next-time (seconds 0.05))
+    (:conerot-x (degrees 0) (degrees 3600))
+    (:conerot-y (degrees 0) (degrees 3600))
+    (:rotate-y (degrees 0))
+    )
+  )
+
+(deftype clock-green-30s (process-drawable)
+  ((root       collide-shape-moving :override)
+   (birth-time time-frame)
+   (base       vector :inline)
+   (old-base   vector :inline)
+   (bob-offset int64)
+   (bob-amount float))
+  (:methods
+   (init-collision! (_type_) object))
+  (:state-methods
+   idle
+   pickup))
+
+(def-actor clock-green-30s
+  :bounds (0 0 0 5))
+
+(defmethod init-collision! ((this clock-green-30s))
+  (let ((cshape (new 'process 'collide-shape-moving this (collide-list-enum hit-by-player))))
+    (set! (-> cshape dynam) (copy *standard-dynamics* 'process))
+    (set! (-> cshape reaction) cshape-reaction-default)
+    (set! (-> cshape no-reaction) (the (function collide-shape-moving collide-query vector vector object) nothing))
+    (let ((sphere (new 'process 'collide-shape-prim-sphere cshape (the-as uint 0))))
+      (set! (-> sphere prim-core collide-as) (collide-spec collectable notice-blue-eco-powerup))
+      (set! (-> sphere prim-core collide-with) (collide-spec jak player-list tobot))
+      (set-vector! (-> sphere local-sphere) 0.0 2048.0 0.0 16384.0)
+      (set! (-> cshape total-prims) (the-as uint 1))
+      (set! (-> cshape root-prim) sphere)
+      )
+    (set! (-> cshape nav-radius) (* 0.75 (-> cshape root-prim local-sphere w)))
+    (let ((prim (-> cshape root-prim)))
+      (set! (-> cshape backup-collide-as) (-> prim prim-core collide-as))
+      (set! (-> cshape backup-collide-with) (-> prim prim-core collide-with))
+      )
+    (set! (-> this root) cshape)
+    )
+  )
+
+(defmethod init-from-entity! ((this clock-green-30s) (e entity-actor))
+  (logior! (-> this mask) (process-mask enemy))
+  (init-collision! this)
+  (process-drawable-from-entity! this e)
+  (set! (-> this bob-amount) 1024.0)
+  (set! (-> this bob-offset)
+        (+ (the int (-> this root trans x)) (the int (-> this root trans y)) (the int (-> this root trans z))))
+  (set-time! (-> this birth-time))
+  (vector-copy! (-> this base) (-> this root trans))
+  (vector-copy! (-> this old-base) (-> this root trans))
+  (initialize-skeleton this *clock-green-30s-sg* '())
+  (set! (-> this part) (create-launch-control group-mercenary-clock-spark this))
+  (logclear! (-> this mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle :proc this)
+  (none))
+
+(defbehavior clock-green-30s-init-by-other clock-green-30s ((pos vector))
+  (logior! (-> self mask) (process-mask enemy))
+  (init-collision! self)
+  (initialize-skeleton self *clock-green-30s-sg* '())
+  (set! (-> self part) (create-launch-control group-mercenary-clock-spark self))
+  (vector-copy! (-> self root trans) pos)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+  (set! (-> self bob-amount) 1024.0)
+  (set! (-> self bob-offset)
+        (+ (the int (-> self root trans x)) (the int (-> self root trans y)) (the int (-> self root trans z))))
+  (set-time! (-> self birth-time))
+  (vector-copy! (-> self base) (-> self root trans))
+  (vector-copy! (-> self old-base) (-> self root trans))
+  (logclear! (-> self mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle))
+
+(defstate idle (clock-green-30s)
+  :virtual #t
+  :event
+    (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+      (when (= (-> proc type) target)
+            (go-virtual pickup)
+      )
+    )
+  :code
+    (behavior ()
+      (loop
+        (quaternion-rotate-y! (-> self root quat) (-> self root quat) (* (degrees 45) (seconds-per-frame)))
+        (let ((bob (-> self bob-amount)))
+          (when (< 0.0 bob)
+                (set! (-> self root trans y)
+                      (+ (-> self base y)
+                        (* bob
+                            (sin (* 109.22667 (the float (mod (+ (- (current-time) (-> self birth-time)) (-> self bob-offset)) (seconds 2))))))))
+                (update-transforms (-> self root))))
+        (suspend)
+      )
+    )
+  :post 
+    (behavior ()
+      (spawn (-> self part) (-> self root trans))  ;; ADDED: spawn particles every frame
+      (transform-post)
+    )
+)
+
+(defstate pickup (clock-green-30s)
+  :virtual #t
+  :code (behavior ()
+    (let ((mgr (handle->process
+                 (-> *game-info*
+                     sub-task-list
+                     (game-task-node city-burning-bush-genc-mercenary-resolution)
+                     info
+                     manager
+                     )
+                 )
+               )
+          )
+      (when mgr
+        (+! (-> (the-as task-manager mgr) time-limit) (seconds 30))
+        )
+      )
+    (sound-play "menu-pick")
+    ;; Hide the actor immediately
+    (logior! (-> self draw status) (draw-control-status no-draw))
+    ;; Draw "+90 seconds" text for 2 seconds
+    (set-time! (-> self state-time))
+    (until (time-elapsed? (-> self state-time) (seconds 2))
+      (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                   (bucket-id debug-no-zbuf1)
+                                  )
+                                  (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) 
+                                                                    (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1))
+                                  )
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 260 63 0.0 (font-color green) (font-flags shadow kerning middle large))))
+          (set! (-> font-ctx scale) 0.3)
+          (pc-encode-utf8-string (string-format "+30 seconds") *pc-encoded-temp-string*)
+          (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+          )
+      )
+      (suspend)
+      )
+    (cleanup-for-death self)
+    (deactivate self)
+    )
+  )
+
+(deftype clock-blue-50s (process-drawable)
+  ((root       collide-shape-moving :override)
+   (birth-time time-frame)
+   (base       vector :inline)
+   (old-base   vector :inline)
+   (bob-offset int64)
+   (bob-amount float))
+  (:methods
+   (init-collision! (_type_) object))
+  (:state-methods
+   idle
+   pickup))
+
+(def-actor clock-blue-50s
+  :bounds (0 0 0 5))
+
+(defmethod init-collision! ((this clock-blue-50s))
+  (let ((cshape (new 'process 'collide-shape-moving this (collide-list-enum hit-by-player))))
+    (set! (-> cshape dynam) (copy *standard-dynamics* 'process))
+    (set! (-> cshape reaction) cshape-reaction-default)
+    (set! (-> cshape no-reaction) (the (function collide-shape-moving collide-query vector vector object) nothing))
+    (let ((sphere (new 'process 'collide-shape-prim-sphere cshape (the-as uint 0))))
+      (set! (-> sphere prim-core collide-as) (collide-spec collectable notice-blue-eco-powerup))
+      (set! (-> sphere prim-core collide-with) (collide-spec jak player-list tobot))
+      (set-vector! (-> sphere local-sphere) 0.0 2048.0 0.0 16384.0)
+      (set! (-> cshape total-prims) (the-as uint 1))
+      (set! (-> cshape root-prim) sphere)
+      )
+    (set! (-> cshape nav-radius) (* 0.75 (-> cshape root-prim local-sphere w)))
+    (let ((prim (-> cshape root-prim)))
+      (set! (-> cshape backup-collide-as) (-> prim prim-core collide-as))
+      (set! (-> cshape backup-collide-with) (-> prim prim-core collide-with))
+      )
+    (set! (-> this root) cshape)
+    )
+  )
+
+(defmethod init-from-entity! ((this clock-blue-50s) (e entity-actor))
+  (logior! (-> this mask) (process-mask enemy))
+  (init-collision! this)
+  (process-drawable-from-entity! this e)
+  (set! (-> this bob-amount) 1024.0)
+  (set! (-> this bob-offset)
+        (+ (the int (-> this root trans x)) (the int (-> this root trans y)) (the int (-> this root trans z))))
+  (set-time! (-> this birth-time))
+  (vector-copy! (-> this base) (-> this root trans))
+  (vector-copy! (-> this old-base) (-> this root trans))
+  (initialize-skeleton this *clock-blue-50s-sg* '())
+  (set! (-> this part) (create-launch-control group-mercenary-clock-spark this))
+  (logclear! (-> this mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle :proc this)
+  (none))
+
+(defbehavior clock-blue-50s-init-by-other clock-blue-50s ((pos vector))
+  (logior! (-> self mask) (process-mask enemy))
+  (init-collision! self)
+  (initialize-skeleton self *clock-blue-50s-sg* '())
+  (set! (-> self part) (create-launch-control group-mercenary-clock-spark self))
+  (vector-copy! (-> self root trans) pos)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+  (set! (-> self bob-amount) 1024.0)
+  (set! (-> self bob-offset)
+        (+ (the int (-> self root trans x)) (the int (-> self root trans y)) (the int (-> self root trans z))))
+  (set-time! (-> self birth-time))
+  (vector-copy! (-> self base) (-> self root trans))
+  (vector-copy! (-> self old-base) (-> self root trans))
+  (logclear! (-> self mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle))
+
+(defstate idle (clock-blue-50s)
+  :virtual #t
+  :event
+    (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+      (when (= (-> proc type) target)
+            (go-virtual pickup)
+      )
+    )
+  :code
+    (behavior ()
+      (loop
+        (quaternion-rotate-y! (-> self root quat) (-> self root quat) (* (degrees 45) (seconds-per-frame)))
+        (let ((bob (-> self bob-amount)))
+          (when (< 0.0 bob)
+                (set! (-> self root trans y)
+                      (+ (-> self base y)
+                        (* bob
+                            (sin (* 109.22667 (the float (mod (+ (- (current-time) (-> self birth-time)) (-> self bob-offset)) (seconds 2))))))))
+                (update-transforms (-> self root))))
+        (suspend)
+      )
+    )
+  :post 
+    (behavior ()
+      (spawn (-> self part) (-> self root trans))  ;; ADDED: spawn particles every frame
+      (transform-post)
+    )
+)
+
+(defstate pickup (clock-blue-50s)
+  :virtual #t
+  :code (behavior ()
+    (let ((mgr (handle->process
+                 (-> *game-info*
+                     sub-task-list
+                     (game-task-node city-burning-bush-genc-mercenary-resolution)
+                     info
+                     manager
+                     )
+                 )
+               )
+          )
+      (when mgr
+        (+! (-> (the-as task-manager mgr) time-limit) (seconds 50))
+        )
+      )
+    (sound-play "menu-pick")
+    ;; Hide the actor immediately
+    (logior! (-> self draw status) (draw-control-status no-draw))
+    ;; Draw "+90 seconds" text for 2 seconds
+    (set-time! (-> self state-time))
+    (until (time-elapsed? (-> self state-time) (seconds 2))
+      (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                   (bucket-id debug-no-zbuf1)
+                                  )
+                                  (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) 
+                                                                    (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1))
+                                  )
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 260 63 0.0 (font-color green) (font-flags shadow kerning middle large))))
+          (set! (-> font-ctx scale) 0.3)
+          (pc-encode-utf8-string (string-format "+50 seconds") *pc-encoded-temp-string*)
+          (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+          )
+      )
+      (suspend)
+      )
+    (cleanup-for-death self)
+    (deactivate self)
+    )
+  )
+
+(deftype clock-gold-90s (process-drawable)
+  ((root       collide-shape-moving :override)
+   (birth-time time-frame)
+   (base       vector :inline)
+   (old-base   vector :inline)
+   (bob-offset int64)
+   (bob-amount float))
+  (:methods
+   (init-collision! (_type_) object))
+  (:state-methods
+   idle
+   pickup))
+
+(def-actor clock-gold-90s
+  :bounds (0 0 0 5))
+
+(defmethod init-collision! ((this clock-gold-90s))
+  (let ((cshape (new 'process 'collide-shape-moving this (collide-list-enum hit-by-player))))
+    (set! (-> cshape dynam) (copy *standard-dynamics* 'process))
+    (set! (-> cshape reaction) cshape-reaction-default)
+    (set! (-> cshape no-reaction) (the (function collide-shape-moving collide-query vector vector object) nothing))
+    (let ((sphere (new 'process 'collide-shape-prim-sphere cshape (the-as uint 0))))
+      (set! (-> sphere prim-core collide-as) (collide-spec collectable notice-blue-eco-powerup))
+      (set! (-> sphere prim-core collide-with) (collide-spec jak player-list tobot))
+      (set-vector! (-> sphere local-sphere) 0.0 2048.0 0.0 16384.0)
+      (set! (-> cshape total-prims) (the-as uint 1))
+      (set! (-> cshape root-prim) sphere)
+      )
+    (set! (-> cshape nav-radius) (* 0.75 (-> cshape root-prim local-sphere w)))
+    (let ((prim (-> cshape root-prim)))
+      (set! (-> cshape backup-collide-as) (-> prim prim-core collide-as))
+      (set! (-> cshape backup-collide-with) (-> prim prim-core collide-with))
+      )
+    (set! (-> this root) cshape)
+    )
+  )
+
+(defmethod init-from-entity! ((this clock-gold-90s) (e entity-actor))
+  (logior! (-> this mask) (process-mask enemy))
+  (init-collision! this)
+  (process-drawable-from-entity! this e)
+  (set! (-> this bob-amount) 1024.0)
+  (set! (-> this bob-offset)
+        (+ (the int (-> this root trans x)) (the int (-> this root trans y)) (the int (-> this root trans z))))
+  (set-time! (-> this birth-time))
+  (vector-copy! (-> this base) (-> this root trans))
+  (vector-copy! (-> this old-base) (-> this root trans))
+  (initialize-skeleton this *clock-gold-90s-sg* '())
+  (set! (-> this part) (create-launch-control group-mercenary-clock-spark this))
+  (logclear! (-> this mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle :proc this)
+  (none))
+
+(defbehavior clock-gold-90s-init-by-other clock-gold-90s ((pos vector))
+  (logior! (-> self mask) (process-mask enemy))
+  (init-collision! self)
+  (initialize-skeleton self *clock-gold-90s-sg* '())
+  (set! (-> self part) (create-launch-control group-mercenary-clock-spark self))
+  (vector-copy! (-> self root trans) pos)
+  (quaternion-identity! (-> self root quat))
+  (vector-identity! (-> self root scale))
+  (set! (-> self bob-amount) 1024.0)
+  (set! (-> self bob-offset)
+        (+ (the int (-> self root trans x)) (the int (-> self root trans y)) (the int (-> self root trans z))))
+  (set-time! (-> self birth-time))
+  (vector-copy! (-> self base) (-> self root trans))
+  (vector-copy! (-> self old-base) (-> self root trans))
+  (logclear! (-> self mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle))
+
+(defstate idle (clock-gold-90s)
+  :virtual #t
+  :event
+    (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+      (when (= (-> proc type) target)
+            (go-virtual pickup)
+      )
+    )
+  :code
+    (behavior ()
+      (loop
+        (quaternion-rotate-y! (-> self root quat) (-> self root quat) (* (degrees 45) (seconds-per-frame)))
+        (let ((bob (-> self bob-amount)))
+          (when (< 0.0 bob)
+                (set! (-> self root trans y)
+                      (+ (-> self base y)
+                        (* bob
+                            (sin (* 109.22667 (the float (mod (+ (- (current-time) (-> self birth-time)) (-> self bob-offset)) (seconds 2))))))))
+                (update-transforms (-> self root))))
+        (suspend)
+      )
+    )
+  :post 
+    (behavior ()
+      (spawn (-> self part) (-> self root trans))  ;; ADDED: spawn particles every frame
+      (transform-post)
+    )
+)
+
+(defstate pickup (clock-gold-90s)
+  :virtual #t
+  :code (behavior ()
+    (let ((mgr (handle->process
+                 (-> *game-info*
+                     sub-task-list
+                     (game-task-node city-burning-bush-genc-mercenary-resolution)
+                     info
+                     manager
+                     )
+                 )
+               )
+          )
+      (when mgr
+        (+! (-> (the-as task-manager mgr) time-limit) (seconds 90))
+        )
+      )
+    (sound-play "menu-pick")
+    ;; Hide the actor immediately
+    (logior! (-> self draw status) (draw-control-status no-draw))
+    ;; Draw "+90 seconds" text for 2 seconds
+    (set-time! (-> self state-time))
+    (until (time-elapsed? (-> self state-time) (seconds 2))
+      (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                   (bucket-id debug-no-zbuf1)
+                                  )
+                                  (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) 
+                                                                    (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1))
+                                  )
+        (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 260 63 0.0 (font-color green) (font-flags shadow kerning middle large))))
+          (set! (-> font-ctx scale) 0.3)
+          (pc-encode-utf8-string (string-format "+90 seconds") *pc-encoded-temp-string*)
+          (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+          )
+      )
+      (suspend)
+      )
+    (cleanup-for-death self)
+    (deactivate self)
+    )
+  )
+
+(deftype merc-darkeco-barrel (process-drawable)
+  ((root          collide-shape-moving :override)
+   (birth-time    time-frame)
+   (base          vector :inline)
+   (old-base      vector :inline)
+   (bob-offset    int64)
+   (bob-amount    float)
+   (lightning-time time-frame)
+   )
+  (:methods
+   (init-collision! (_type_) object))
+  (:state-methods
+   idle
+   die))
+
+(def-actor merc-darkeco-barrel
+  :bounds (0 0 0 5))
+
+(defmethod init-collision! ((this merc-darkeco-barrel))
+  (let ((cshape (new 'process 'collide-shape-moving this (collide-list-enum hit-by-player))))
+    (set! (-> cshape dynam) (copy *standard-dynamics* 'process))
+    (set! (-> cshape reaction) cshape-reaction-default)
+    (set! (-> cshape no-reaction) (the (function collide-shape-moving collide-query vector vector object) nothing))
+    (let ((mesh (new 'process 'collide-shape-prim-mesh cshape (the uint 0) (the uint 0))))
+      (set! (-> mesh prim-core collide-as) (collide-spec pusher))
+      (set! (-> mesh collide-with) (collide-spec jak player-list))
+      (set! (-> mesh prim-core action) (collide-action solid rideable))
+      (set! (-> mesh transform-index) 0)
+      (set! (-> cshape total-prims) (the uint 1))
+      (set! (-> cshape root-prim) mesh)
+      (set-vector! (-> mesh local-sphere) 0.0 (meters 0) 0.0 (meters 5)))
+    (pusher-init cshape)
+    (set! (-> cshape nav-radius) (* 0.75 (-> cshape root-prim local-sphere w)))
+    (let ((prim (-> cshape root-prim)))
+      (set! (-> cshape backup-collide-as) (-> prim prim-core collide-as))
+      (set! (-> cshape backup-collide-with) (-> prim prim-core collide-with))
+      )
+    (set! (-> this root) cshape))
+  )
+
+(defmethod init-from-entity! ((this merc-darkeco-barrel) (e entity-actor))
+  (logior! (-> this mask) (process-mask enemy))
+  (init-collision! this)
+  (process-drawable-from-entity! this e)
+  (set! (-> this bob-amount) 1024.0)
+  (set! (-> this bob-offset)
+        (+ (the int (-> this root trans x)) (the int (-> this root trans y)) (the int (-> this root trans z))))
+  (set-time! (-> this birth-time))
+  (vector-copy! (-> this base) (-> this root trans))
+  (vector-copy! (-> this old-base) (-> this root trans))
+  (initialize-skeleton this *merc-darkeco-barrel-sg* '())
+  (set-vector! (-> this root scale) 1.8 1.8 1.8 1.0)
+  ;; (set-vector! (-> this draw color-mult) 1.0 0.0 1.0 1.0) ;; change colour 
+  (set-vector! (-> this draw color-emissive) 0.25 0.25 0.25 1.0) ;; change colour
+  (set! (-> this part) (create-launch-control group-darkjak-bomb this))
+  (logclear! (-> this mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle :proc this)
+  (none))
+
+(defbehavior merc-darkeco-barrel-init-by-other merc-darkeco-barrel ((pos vector))
+  (logior! (-> self mask) (process-mask enemy))
+  (init-collision! self)
+  (initialize-skeleton self *merc-darkeco-barrel-sg* '())
+  ;; (set-vector! (-> self draw color-mult) 1.0 0.0 1.0 1.0) ;; change colour 
+  (set-vector! (-> self draw color-emissive) 0.25 0.25 0.25 1.0) ;; change colour
+  (set! (-> self part) (create-launch-control group-darkjak-bomb self))
+  (vector-copy! (-> self root trans) pos)
+  (quaternion-identity! (-> self root quat))
+  (set-vector! (-> self root scale) 1.8 1.8 1.8 1.0)
+  (set! (-> self bob-amount) 1024.0)
+  (set! (-> self bob-offset)
+        (+ (the int (-> self root trans x)) (the int (-> self root trans y)) (the int (-> self root trans z))))
+  (set-time! (-> self birth-time))
+  (vector-copy! (-> self base) (-> self root trans))
+  (vector-copy! (-> self old-base) (-> self root trans))
+  (logclear! (-> self mask) (process-mask actor-pause))
+  (transform-post)
+  (go-virtual idle))
+
+(defstate idle (merc-darkeco-barrel)
+  :virtual #t
+  :event
+    (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+      (case message
+        (('attack)
+         (go-virtual die)
+         )
+        (('touch)
+         #t
+         )
+        )
+      )
+  :code
+    (behavior ()
+      (loop
+        (suspend)))
+        :post (behavior ()
+    (transform-post)
+    (when (< (-> self lightning-time) (current-time))
+      (set! (-> self lightning-time)
+            (+ (current-time) (the int (* 300.0 (rand-vu-float-range 0.5 1.5))))
+            )
+      (let ((start (new 'stack-no-clear 'vector))
+            (end   (new 'stack-no-clear 'vector))
+            )
+        ;; Start always at the barrel's root position
+        (set! (-> start quad) (-> self root trans quad))
+        (+! (-> start y) (meters 4))
+        ;; Raycast straight down from the barrel to find the ground
+        (let ((cquery (new 'stack-no-clear 'collide-query)))
+          (set! (-> cquery start-pos quad) (-> start quad))
+          (set-vector! (-> cquery move-dist) 0.0 (meters -40) 0.0 1.0)
+          (set! (-> cquery radius) 40.96)
+          (set! (-> cquery collide-with) (collide-spec backgnd))
+          (set! (-> cquery ignore-process0) self)
+          (set! (-> cquery ignore-process1) #f)
+          (set! (-> cquery ignore-pat)
+                (new 'static 'pat-surface :noentity #x1 :nojak #x1 :probe #x1 :noendlessfall #x1)
+                )
+          (set! (-> cquery action-mask) (collide-action solid))
+          (let ((hit (fill-and-probe-using-line-sphere *collide-cache* cquery)))
+            (cond
+              ((>= hit 0.0)
+               ;; Use exact ground hit point, then add a small random offset
+               (vector+float*! end (-> cquery start-pos) (-> cquery move-dist) hit)
+               (set! (-> end x) (+ (-> end x) (rand-vu-float-range -10240.0 10240.0)))
+               (set! (-> end z) (+ (-> end z) (rand-vu-float-range -10240.0 10240.0)))
+               )
+              (else
+               ;; No ground — arc to a fixed point below
+               (set! (-> end quad) (-> start quad))
+               (+! (-> end y) (meters -5))
+               )
+              )
+            )
+          )
+        (process-spawn
+          lightning-tracker
+          :init lightning-tracker-init
+          (-> *lightning-spec-id-table* 10)
+          0
+          lightning-probe-callback
+          self
+          start
+          end
+          :to self
+          )
+        )
+      )
+    )
+  )
+
+(defstate die (merc-darkeco-barrel)
+  :virtual #t
+  :code (behavior ()
+    (sound-play "explosion")
+    (let ((pos (new 'stack-no-clear 'vector)))
+      (set! (-> pos quad) (-> self root trans quad))
+      (+! (-> pos y) (meters 2.5))  ;; raise explosion to center of barrel
+      (part-tracker-spawn
+        :to *entity-pool*
+        :group group-dark-eco-box-explosion
+        :mat-joint pos
+        )
+      (part-tracker-spawn
+        :to *entity-pool*
+        :group group-darkjak-bomb
+        :mat-joint pos
+        )
+      )
+    ;; Spark arc effect on Jak — multiple bolts for a powerful look
+    (when *target*
+      (dotimes (i 5)
+        (process-drawable-shock-wall-effect
+          *target*
+          (-> *lightning-spec-id-table* 8)
+          lightning-probe-callback
+          (-> *part-id-table* 179)
+          )
+        (process-drawable-shock-effect
+          *target*
+          (-> *lightning-spec-id-table* 6)
+          lightning-probe-callback
+          (-> *part-id-table* 179)
+          0
+          0
+          81920.0
+          )
+        )
+      )
+    (send-event *target* 'get-pickup (pickup-type eco-pill-dark) 100.0)
+    (play-sound-file "jak3-fulldark.wav" (the int (* (-> *setting-control* user-current sfx-volume) 30.0)))
+    (cleanup-for-death self)
+    (deactivate self)
+    )
+  )
+
+(define *merc-tracking-active* #f)
+(define *merc-kill-count* 0)
+
+(defbehavior security-wall-init-by-other security-wall ((pt0 vector) (pt1 vector) (height float))
+  (set! (-> self breach) #f)
+  (set! (-> self pass) 0)  ;; pass 0 never matches any pass-feature check — wall stays permanently closed
+  (set! (-> self touch-count) 0)
+  (set! (-> self flash) 0.0)
+  (set! (-> self message) 0)
+  (set! (-> self next-message-time) 0)
+  ;; Set up collision shape (same as security-wall-method-22)
+  (let ((s2-0 (new 'process 'collide-shape self (collide-list-enum usually-hit-by-player))))
+    (let ((v1-0 (new 'process 'collide-shape-prim-mesh s2-0 (the-as uint 0) (the-as uint 0))))
+      (set! (-> v1-0 prim-core collide-as) (collide-spec blocking-plane camera-blocker))
+      (set! (-> v1-0 prim-core collide-with) (collide-spec jak player-list))
+      (set! (-> v1-0 prim-core action) (collide-action solid))
+      (set! (-> v1-0 transform-index) 3)
+      (set! (-> s2-0 total-prims) (the-as uint 1))
+      (set! (-> s2-0 root-prim) v1-0)
+      )
+    (set! (-> s2-0 nav-radius) (* 0.75 (-> s2-0 root-prim local-sphere w)))
+    (let ((v1-3 (-> s2-0 root-prim)))
+      (set! (-> s2-0 backup-collide-as) (-> v1-3 prim-core collide-as))
+      (set! (-> s2-0 backup-collide-with) (-> v1-3 prim-core collide-with))
+      )
+    (set! (-> self root) s2-0)
+    )
+  ;; Set up transform and plane from the two endpoints (mirrors security-wall-method-22)
+  (let ((mtx (new 'stack-no-clear 'matrix))
+        (root (-> self root))
+        )
+    (vector+! (-> root trans) pt0 pt1)
+    (vector-float*! (-> root trans) (-> root trans) 0.5)
+    (+! (-> root trans y) (/ height 2))
+    (vector-! (-> mtx vector 0) pt1 pt0)
+    (let ((wall-len (vector-normalize-ret-len! (-> mtx vector 0) 1.0)))
+      (set! (-> root scale x) (/ wall-len METER_LENGTH))
+      (set! (-> root scale y) (/ height METER_LENGTH))
+      (set! (-> root scale z) 1.0)
+      (set! (-> mtx vector 1 quad) (-> (new 'static 'vector :y 1.0 :w 1.0) quad))
+      (vector-cross! (-> mtx vector 2) (-> mtx vector 0) (-> mtx vector 1))
+      (vector-normalize! (-> mtx vector 2) 1.0)
+      (matrix->quaternion (-> root quat) mtx)
+      (set! (-> self plane quad) (-> mtx vector 2 quad))
+      (set! (-> self plane w) (- (vector-dot (-> mtx vector 2) (-> root trans))))
+      (let ((sph (-> root root-prim local-sphere)))
+        (set! (-> sph x) 0.0)
+        (set! (-> sph y) (* 0.00024414062 (/ height 2)))
+        (set! (-> sph z) 0.0)
+        (set! (-> sph w) (* 0.5 (sqrtf (+ (* wall-len wall-len) (* height height)))))
+        )
+      )
+    )
+  ;; Load skeleton and visual setup
+  (initialize-skeleton
+    self
+    (the-as skeleton-group (art-group-get-by-name *level* "skel-security-wall" (the-as (pointer uint32) #f)))
+    (the-as pair 0)
+    )
+  (set! (-> self root event-self) 'touched)
+  (logior! (-> self draw status) (draw-control-status disable-fog))
+  (set-security-texture-masks! (the-as vector (-> self draw mgeo header texture-usage-group data 4)))
+  ;; Default color since pass 0 has no specific color
+  (set-vector! (-> self color) 1.0 1.0 1.0 1.0)
+  (set-security-color! (-> self color))
+  (set-vector! (-> self draw color-mult) 1.0 1.0 1.0 1.0)
+  (set-vector! (-> self draw color-emissive) 25.0 25.0 25.0 1.0)
+  (transform-post)
+  (go-virtual idle-close)
+  (none)
+  )
+
+(deftype merc-genc-transport-info (structure)
+  ((id          uint32)
+   (spawned     basic)
+   (plane-pos   vector      :inline)
+   (plane-quat  quaternion  :inline)
+   (t-pos       vector      :inline)
+   (t-quat      quaternion  :inline)
+   (num-guard   uint32)
+   (nav-mesh-id uint32)
+   )
+  )
+
+(define *merc-genc-transport-info* (new 'static 'boxed-array :type merc-genc-transport-info
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x1
+                                        :plane-pos (new 'static 'vector :x (meters  84.87) :y (meters   7.99) :z (meters 276.78) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x -0.00 :y 0.00 :z -0.00 :w -0.99)
+                                        :t-pos (new 'static 'vector :x (meters  87.07) :y (meters  19.00) :z (meters 265.88) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x 0.00 :y -0.99 :z -0.00 :w -0.01)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x2
+                                        :plane-pos (new 'static 'vector :x (meters 123.58) :y (meters   9.06) :z (meters 277.81) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y -0.67 :z 0.00 :w 0.74)
+                                        :t-pos (new 'static 'vector :x (meters 132.46) :y (meters  19.5) :z (meters 278.98) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x 0.00 :y 0.70 :z 0.00 :w 0.70)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x3
+                                        :plane-pos (new 'static 'vector :x (meters  36.08) :y (meters   8.00) :z (meters 351.85) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y -0.69 :z -0.00 :w -0.72)
+                                        :t-pos (new 'static 'vector :x (meters  25.59) :y (meters  20.00) :z (meters 351.30) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x 0.00 :y -0.72 :z 0.00 :w 0.68)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x4
+                                        :plane-pos (new 'static 'vector :x (meters 171.17) :y (meters   9.70) :z (meters 309.87) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y 0.99 :z 0.00 :w -0.03)
+                                        :t-pos (new 'static 'vector :x (meters 171.59) :y (meters  20.32) :z (meters 319.64) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x 0.00 :y 0.00 :z -0.00 :w 0.99)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x5
+                                        :plane-pos (new 'static 'vector :x (meters 207.64) :y (meters   9.70) :z (meters 323.28) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x 0.00 :y 0.91 :z 0.00 :w -0.39)
+                                        :t-pos (new 'static 'vector :x (meters 212.95) :y (meters  18.70) :z (meters 328.37) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x -0.00 :y -0.39 :z 0.00 :w -0.91)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x6
+                                        :plane-pos (new 'static 'vector :x (meters 205.76) :y (meters   7.99) :z (meters 374.48) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x  -0.00 :y  -0.99 :z   0.00 :w  -0.09)
+                                        :t-pos (new 'static 'vector :x (meters 205.74) :y (meters  25.57) :z (meters 379.09) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y  -0.05 :z  -0.00 :w   0.99)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x7
+                                        :plane-pos (new 'static 'vector :x (meters 279.05) :y (meters   9.74) :z (meters 277.11) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y  -0.72 :z   0.00 :w  -0.69)
+                                        :t-pos (new 'static 'vector :x (meters 270.96) :y (meters  21.08) :z (meters 277.15) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.67 :z  -0.00 :w  -0.73)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x8
+                                        :plane-pos (new 'static 'vector :x (meters 296.75) :y (meters   7.99) :z (meters 239.64) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x  -0.00 :y  -0.35 :z   0.00 :w   0.93)
+                                        :t-pos (new 'static 'vector :x (meters 307.23) :y (meters  21.87) :z (meters 224.93) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y   0.94 :z  -0.00 :w   0.33)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x9
+                                        :plane-pos (new 'static 'vector :x (meters 252.60) :y (meters   7.99) :z (meters 214.26) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x  -0.00 :y  -0.39 :z  -0.00 :w  -0.92)
+                                        :t-pos (new 'static 'vector :x (meters 246.77) :y (meters  21.30) :z (meters 208.95) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.95 :z   0.00 :w  -0.29)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #xa
+                                        :plane-pos (new 'static 'vector :x (meters 150.00) :y (meters  11.08) :z (meters 201.82) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x  -0.00 :y  -0.72 :z  -0.00 :w  -0.68)
+                                        :t-pos (new 'static 'vector :x (meters 140.83) :y (meters  25.19) :z (meters 202.02) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.65 :z   0.00 :w  -0.75)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #xb
+                                        :plane-pos (new 'static 'vector :x (meters  78.35) :y (meters   8.72) :z (meters 198.11) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y   0.43 :z   0.00 :w   0.90)
+                                        :t-pos (new 'static 'vector :x (meters  74.55) :y (meters  21.12) :z (meters 192.41) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y   0.94 :z  -0.00 :w  -0.32)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #xc
+                                        :plane-pos (new 'static 'vector :x (meters 139.52) :y (meters   7.99) :z (meters 149.79) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y  -0.00 :z  -0.00 :w   0.99)
+                                        :t-pos (new 'static 'vector :x (meters 138.41) :y (meters  20.27) :z (meters 139.57) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.99 :z   0.00 :w   0.02)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #xd
+                                        :plane-pos (new 'static 'vector :x (meters 191.95) :y (meters   9.72) :z (meters  95.30) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y  -0.67 :z  -0.00 :w   0.73)
+                                        :t-pos (new 'static 'vector :x (meters 210.01) :y (meters  23.00) :z (meters  96.05) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.71 :z   0.00 :w   0.70)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #xe
+                                        :plane-pos (new 'static 'vector :x (meters 271.61) :y (meters   9.72) :z (meters 124.46) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y   0.01 :z  -0.00 :w   0.99)
+                                        :t-pos (new 'static 'vector :x (meters 271.54) :y (meters  20.84) :z (meters 110.03) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y  -0.99 :z  -0.00 :w   0.02)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #xf
+                                        :plane-pos (new 'static 'vector :x (meters 305.41) :y (meters   8.72) :z (meters  53.24) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y   0.89 :z  -0.00 :w   0.44)
+                                        :t-pos (new 'static 'vector :x (meters 296.12) :y (meters  20.63) :z (meters  60.64) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y  -0.27 :z  -0.00 :w   0.96)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x10
+                                        :plane-pos (new 'static 'vector :x (meters 131.87) :y (meters   8.00) :z (meters  17.51) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x  -0.00 :y   0.71 :z   0.00 :w  -0.70)
+                                        :t-pos (new 'static 'vector :x (meters 143.60) :y (meters  20.69) :z (meters  17.70) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.73 :z   0.00 :w   0.68)
+                                        :num-guard #x14
+                                        :nav-mesh-id 32209
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x11
+                                        :plane-pos (new 'static 'vector :x (meters  55.84) :y (meters   8.45) :z (meters  72.32) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y  -0.71 :z  -0.00 :w   0.70)
+                                        :t-pos (new 'static 'vector :x (meters  68.70) :y (meters  21.62) :z (meters  72.12) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y  -0.70 :z  -0.00 :w  -0.70)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x12
+                                        :plane-pos (new 'static 'vector :x (meters  25.49) :y (meters   7.99) :z (meters 163.04) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y  -0.00 :z  -0.00 :w   0.99)
+                                        :t-pos (new 'static 'vector :x (meters  24.88) :y (meters  20.22) :z (meters 148.32) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y   0.99 :z   0.00 :w  -0.00)
+                                        :num-guard #x14
+                                        :nav-mesh-id 21891
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x13
+                                        :plane-pos (new 'static 'vector :x (meters 354.76) :y (meters   7.99) :z (meters  92.77) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y   0.99 :z  -0.00 :w  -0.01)
+                                        :t-pos (new 'static 'vector :x (meters 353.69) :y (meters  20.99) :z (meters 103.73) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.02 :z   0.00 :w  -0.99)
+                                        :num-guard #x14
+                                        :nav-mesh-id 32210
+                                        )
+                                      (new 'static 'merc-genc-transport-info ;; nav mesh aid: 32210
+                                        :id #x14
+                                        :plane-pos (new 'static 'vector :x (meters 353.55) :y (meters   7.99) :z (meters 182.00) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x  -0.00 :y   0.99 :z  -0.00 :w  -0.01)
+                                        :t-pos (new 'static 'vector :x (meters 353.25) :y (meters  21.86) :z (meters 191.26) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y  -0.02 :z  -0.00 :w  -0.99)
+                                        :num-guard #x14
+                                        :nav-mesh-id 32210
+                                        )
+                                      (new 'static 'merc-genc-transport-info ;; nav mesh aid: 32210
+                                        :id #x15
+                                        :plane-pos (new 'static 'vector :x (meters 358.30) :y (meters   8.00) :z (meters 283.35) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y   0.99 :z   0.00 :w  -0.00)
+                                        :t-pos (new 'static 'vector :x (meters 358.52) :y (meters  20.37) :z (meters 296.66) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x   0.00 :y   0.00 :z  -0.00 :w   0.99)
+                                        :num-guard #x14
+                                        :nav-mesh-id 32210
+                                        )
+                                      (new 'static 'merc-genc-transport-info ;; nav mesh aid: 32210
+                                        :id #x16
+                                        :plane-pos (new 'static 'vector :x (meters 322.33) :y (meters   7.99) :z (meters 362.77) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x   0.00 :y   0.71 :z   0.00 :w  -0.69)
+                                        :t-pos (new 'static 'vector :x (meters 337.28) :y (meters  21.08) :z (meters 363.35) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y  -0.69 :z   0.00 :w  -0.72)
+                                        :num-guard #x14
+                                        :nav-mesh-id 32210
+                                        )
+                                      (new 'static 'merc-genc-transport-info
+                                        :id #x17
+                                        :plane-pos (new 'static 'vector :x (meters 245.90) :y (meters   8.00) :z (meters  17.37) :w 1.0)
+                                        :plane-quat (new 'static 'quaternion :x  -0.00 :y   0.70 :z   0.00 :w   0.71)
+                                        :t-pos (new 'static 'vector :x (meters 231.28) :y (meters  20.87) :z (meters  17.18) :w 1.0)
+                                        :t-quat (new 'static 'quaternion :x  -0.00 :y   0.73 :z  -0.00 :w  -0.68)
+                                        :num-guard #x14
+                                        :nav-mesh-id 32209
+                                        )
+                                      )
+        )
+
+(defbehavior merc-show-rules task-manager ()
+  (logior! (-> *game-info* secrets) (game-secrets invulnerable))
+  (until (process-grab? *target* #f) (suspend))
+  (until (cpad-pressed? 0 confirm)
+    (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                (bucket-id debug-no-zbuf1)
+                                )
+                                (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) 
+                                                                  (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1))
+                                )
+      (let ((level-string (cond
+                      ((= (level-status *level* 'ctyslumc) 'active)  "(Water Slums)")
+                      ((= (level-status *level* 'ctygenc) 'active)   "(Central Plaza)")
+                      ((= (level-status *level* 'ctymarkb) 'active)  "(Bazaar)")
+                      ((= (level-status *level* 'stadium) 'active)   "(Forest)")
+                      )
+                    )
+           )
+      ;; Jak the Mercenary line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 75 0.0 (font-color yellow) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.8)
+        (pc-encode-utf8-string (string-format "Jak the Mercenary") *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; Level line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 100 0.0 (font-color yellow) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.7)
+        (pc-encode-utf8-string (string-format level-string) *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; Destroy as many guards line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 160 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.4)
+        (pc-encode-utf8-string (string-format "Destroy as many guards as you can within the time limit!") *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; Collect clocks line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 200 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.4)
+        (pc-encode-utf8-string (string-format "Collect clock items for extra time!") *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; Go for high score line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 240 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.4)
+        (pc-encode-utf8-string (string-format "Aim for the high-score!") *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 370 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.6)
+        (format (clear *temp-string*) "Press ~S to start!" (lookup-text! *common-text* (text-id pad-x) #f))
+        (pc-encode-utf8-string *temp-string* *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      )
+    )
+    (suspend)
+  )
+  (logclear! (-> *cpad-list* cpads 0 button0-abs 0) (pad-buttons confirm x))
+  (logclear! (-> *cpad-list* cpads 0 button0-rel 0) (pad-buttons confirm x))
+  (logclear! (-> *game-info* secrets) (game-secrets invulnerable))
+  (until (process-release? *target*) (suspend))
+  (play-sound-file "gunshot-2.wav" (the int (* (-> *setting-control* user-current sfx-volume) 30.0)))
+)
+
+(defbehavior merc-show-results task-manager ()
+  ;; Kill HUDs
+  (send-event (handle->process (-> self slave 27)) 'hide-and-die)
+  (send-event (handle->process (-> self slave 28)) 'hide-and-die)
+  (send-event (handle->process (-> self slave 31)) 'hide-and-die)
+  ;; Save highscore
+  (game-info-method-28 *game-info* (game-score merc-genc) (-> *game-info* score))
+  ;; Despawn all transports
+  (dotimes (i (length *merc-genc-transport-info*))
+           (when (handle->process (-> self slave i))
+                 (send-event (handle->process (-> self slave i)) 'leave)
+           )
+  )
+  ;; Stop new transports from spawning by setting the flag to 1
+  (set! (-> self data-int32 6) 1)
+  ;; Lower alert level
+  (send-event *traffic-manager* 'set-alert-level 0)
+  ;; Make Jak "invisible" to guards 
+    (when *target* (logclear! (-> *target* mask) (process-mask target)))
+  ;; Compute rank
+  (let* ((kills       (the int (-> *game-info* score)))
+         (hi-score    (the int (-> (get-game-score-ref *game-info* (the-as int (game-score merc-genc))) 0)))
+         (rank-string (cond
+                        ((>= kills 500) "Renegade")
+                        ((>= kills 400) "Our Hero!")
+                        ((>= kills 300) "Heir of Mar")
+                        ((>= kills 200) "Underground Fighter")
+                        ((>= kills 100) "Time Traveller")
+                        ((>= kills 50)  "Brave Adventurer")
+                        (else           "Villager")
+                      )
+         )
+        )
+    ;; Play jingle if this run is a new high score
+    (when (>= kills hi-score)
+      (play-sound-file "item-obtained.mp3" (the int (* (-> *setting-control* user-current sfx-volume) 200.0)))
+      )
+    (until (or (cpad-pressed? 0 confirm) (cpad-pressed? 0 triangle))
+           (process-grab? *target* #f) ;; Remove control of Jak
+           (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                        (bucket-id debug-no-zbuf1)
+                                       )
+                                       (dma-buffer-add-gs-set-flusha buf (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1)) 
+                                                                         (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1))
+                                       )
+      ;; RESULT line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 50 0.0 (font-color red) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 1.8)
+        (pc-encode-utf8-string (string-format "Results") *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; High Score line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 160 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.6)
+        (pc-encode-utf8-string (string-format "High Score: ~D" hi-score) *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; Total Points line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 210 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.6)
+        (pc-encode-utf8-string (string-format "Total Points: ~D" kills) *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; Rank line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 260 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.6)
+        (pc-encode-utf8-string (string-format "Rank: ~S" rank-string) *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; Retry? line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 340 0.0 (font-color progress-old-yellow) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.7)
+        (pc-encode-utf8-string (string-format "Try Again?") *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; X = Yes, Δ = No line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 370 0.0 (font-color progress-old-yellow) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.7)
+        (format (clear *temp-string*) "~S = Yes, ~S = No"
+                (lookup-text! *common-text* (text-id pad-x) #f)
+                (lookup-text! *common-text* (text-id pad-triangle) #f))
+        (pc-encode-utf8-string *temp-string* *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+  )
+    (suspend)
+    )
+    ;; Capture button press BEFORE releasing control
+  (let ((pressed-confirm (cpad-pressed? 0 confirm)))
+  ;; Clear the X button press so Jak doesn't jump when control is restored
+  (logclear! (-> *cpad-list* cpads 0 button0-abs 0) (pad-buttons confirm x))
+  (logclear! (-> *cpad-list* cpads 0 button0-rel 0) (pad-buttons confirm x))
+  ;; Release control back to Jak
+  (until (process-release? *target*)
+    (suspend)
+    )
+  
+  (if pressed-confirm
+      ;; X — retry mission
+      (let ((a1-0 (new 'stack-no-clear 'fail-mission-params)))
+        (set! (-> a1-0 flags) (fail-mission-flags famflags-0 famflags-2))
+        (set! (-> a1-0 message) (fail-mission-message fammsg-1))
+        (set! (-> a1-0 retry-continue) (-> self info retry-continue))
+        (set! (-> a1-0 fail-continue) (-> self info retry-continue))
+        (set! (-> a1-0 reset-delay) (the-as uint 0))
+        (set! (-> a1-0 task) (-> self node-info task))
+        (set! (-> a1-0 fail-message) (text-id null))
+        (logior! (-> a1-0 flags) (fail-mission-flags famflags-3 famflags-4 famflags-5 famflags-6))
+        (start! *fail-mission-control* a1-0)
+        (while (handle->process (-> *fail-mission-control* process))
+          (suspend)
+          )
+        )
+      ;; Triangle - close task node and reopen it, ending task on the spot 
+      (and (task-node-close! (game-task-node city-burning-bush-genc-mercenary-resolution))
+           (task-node-open! (game-task-node city-burning-bush-genc-mercenary-introduction))
+      )
+      )
+    )
+  )
+  (none)
+)
+
+;; Variable to count previous score to play sound 
+(define *merc-prev-score* 0)
+
+(set-subtask-hook!
+  *game-info*
+  (game-task-node city-burning-bush-genc-mercenary-resolution)
+  TASK_MANAGER_INIT_HOOK
+  (lambda :behavior task-manager
+    ()
+    (case (the int (* (rand-vu) 5.0))
+        ((0) (set-setting! 'music 'danger4  0.0 0)) ;; kor boss theme
+        ((1) (set-setting! 'music 'danger6  0.0 0)) ;; krew boss theme
+        ((2) (set-setting! 'music 'danger7  0.0 0)) ;; tomb boss theme
+        ((3) (set-setting! 'music 'danger9  0.0 0)) ;; tanker ambush theme
+        ((4) (set-setting! 'music 'danger11 0.0 0)) ;; fortress dump theme
+        )
+    (merc-show-rules)
+    (set-setting! 'exclusive-task #f 0.0 (-> self node-info task))
+    (set-setting! 'airlock #f 0.0 0)
+    (let ((v1-5 (entity-by-name "parking-spot-1")))
+      (if v1-5
+          (logior! (-> v1-5 extra perm status) (entity-perm-status bit-9))
+          )
+      )
+    (let ((v1-7 (entity-by-name "parking-spot-2")))
+      (if v1-7
+          (logior! (-> v1-7 extra perm status) (entity-perm-status bit-9))
+          )
+      )
+    (let ((v1-9 (entity-by-name "parking-spot-12")))
+      (if v1-9
+          (logior! (-> v1-9 extra perm status) (entity-perm-status bit-9))
+          )
+      )
+    (let ((v1-11 (entity-by-name "parking-spot-59")))
+      (if v1-11
+          (logior! (-> v1-11 extra perm status) (entity-perm-status bit-9))
+          )
+      )
+    (let ((v1-13 (entity-by-name "parking-spot-60")))
+      (if v1-13
+          (logior! (-> v1-13 extra perm status) (entity-perm-status bit-9))
+          )
+      )
+    (let ((v1-15 (entity-by-name "parking-spot-61")))
+      (if v1-15
+          (logior! (-> v1-15 extra perm status) (entity-perm-status bit-9))
+          )
+      )
+    (let ((v1-17 (entity-by-name "parking-spot-62")))
+      (if v1-17
+          (logior! (-> v1-17 extra perm status) (entity-perm-status bit-9))
+          )
+      )
+    (let ((gp-0 *traffic-manager*))
+      (send-event gp-0 'set-alert-level 4)
+      (send-event gp-0 'set-alert-duration (seconds 36000))
+      (send-event gp-0 'deactivate-by-type (traffic-type crimson-guard-1))
+      (send-event gp-0 'deactivate-by-type (traffic-type guard-bike))
+      (send-event gp-0 'deactivate-by-type (traffic-type hellcat))
+      (send-event gp-0 'deactivate-by-type (traffic-type traffic-type-20))
+      (send-event gp-0 'deactivate-by-type (traffic-type bikea))
+      (send-event gp-0 'deactivate-by-type (traffic-type bikeb))
+      (send-event gp-0 'deactivate-by-type (traffic-type bikec))
+      (send-event gp-0 'deactivate-by-type (traffic-type cara))
+      (send-event gp-0 'deactivate-by-type (traffic-type carb))
+      (send-event gp-0 'deactivate-by-type (traffic-type carc))
+      (send-event gp-0 'set-object-target-count (traffic-type crimson-guard-1) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type guard-bike) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type hellcat) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type bikea) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type bikeb) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type bikec) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type cara) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type carb) 0)
+      (send-event gp-0 'set-object-target-count (traffic-type carc) 0)
+      (send-event gp-0 'set-object-auto-activate (traffic-type crimson-guard-1) #f)
+      (send-event gp-0 'set-guard-target-count-range 0 8 8)
+      (send-event gp-0 'set-guard-target-count-range 1 12 12)
+      (send-event gp-0 'set-guard-target-count-range 4 0 0)
+      (send-event gp-0 'set-guard-target-count-range 5 0 0)
+      (set! (-> (-> *traffic-manager* traffic-engine) object-type-info-array (traffic-type crimson-guard-1) target-count) 20)
+      (set! (-> (-> *traffic-manager* traffic-engine) object-type-info-array (traffic-type crimson-guard-1) want-count) 20)
+      )
+    (speech-table-set! *speech-control* (speech-type speech-type-6) (new 'static 'speech-type-info
+                                                                      :channel #x1
+                                                                      :priority -2
+                                                                      :min-delay (seconds 2)
+                                                                      :max-delay (seconds 4)
+                                                                      :list (new 'static 'boxed-array :type string
+                                                                        "kg320a"
+                                                                        "kg321a"
+                                                                        "kg322a"
+                                                                        "kg357a"
+                                                                        "kg323a"
+                                                                        "kg324a"
+                                                                        "kg325a"
+                                                                        "kg294a"
+                                                                        "kg327a"
+                                                                        "kg328a"
+                                                                        "kg329a"
+                                                                        "kg330a"
+                                                                        "kg332a"
+                                                                        "kg333a"
+                                                                        "kg335a"
+                                                                        "kg336a"
+                                                                        "kg337a"
+                                                                        "kg338a"
+                                                                        "kg339a"
+                                                                        "kg340a"
+                                                                        "kg341a"
+                                                                        "kg342a"
+                                                                        "kg343a"
+                                                                        "kg344a"
+                                                                        "kg345a"
+                                                                        "kg347a"
+                                                                        "kg351a"
+                                                                        "kg353a"
+                                                                        "kg359a"
+                                                                        "kg362a"
+                                                                        "kg378a"
+                                                                        )
+                                                                      )
+                       )
+    (dotimes (gp-1 (length *merc-genc-transport-info*))
+      (set! (-> *merc-genc-transport-info* gp-1 spawned) #f)
+      )
+    (set! *merc-kill-count* 0) ;; Counts dead guards
+    (set! *merc-prev-score* 0) ;; Variable to count previous score to play sound, setting to 0 here
+    (set! *merc-tracking-active* #t)
+    (set! (-> self data-int32 0) 0)  ;; mission transport dead completion flag
+    (set! (-> self data-int32 1) 0)  ;; blocking plane spawned flag
+    (set! (-> self data-int32 2) 0)  ;; first-frame init flag
+    (set! (-> self data-int32 3) 0)  ;; kill count
+    (set! (-> self data-int32 4) 0)  ;; prev dead guards
+    (set! (-> self data-int32 6) 0)  ;; keep spawn transports flag
+    (set! (-> *game-info* score) 0.0)
+    (set! (-> *game-info* goal) (-> (get-game-score-ref *game-info* (the-as int (game-score merc-genc))) 0))
+    (set! (-> self start-time) (-> *display* game-clock frame-counter))
+    (set! (-> self time-limit) (seconds 120))
+    (set! (-> self slave 27)
+          (ppointer->handle (process-spawn hud-timer :init hud-init-by-other :to self)))
+    (set! (-> self slave 28)
+          (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
+    (set! (-> self slave 31)
+          (ppointer->handle (process-spawn hud-goal :init hud-init-by-other :to self)))
+    ;; Set up stats to be consistent each time 
+      (set! (-> *game-info* eco-pill-dark) 0.0)
+      (set! (-> *game-info* gun-ammo 0) (-> *FACT-bank* ammo-yellow-start))
+      (set! (-> *game-info* gun-ammo 1) (-> *FACT-bank* ammo-red-start))
+      (set! (-> *game-info* gun-ammo 2) (-> *FACT-bank* ammo-blue-start))
+      (set! (-> *game-info* gun-ammo 3) (-> *FACT-bank* ammo-dark-start))
+    ;; Start gradual transition toward heavy rain
+    (set! (-> *mood-control* overide-weather-flag) #f)
+    (set! (-> *mood-control* target-interp cloud) 1.0)
+    (set! (-> *mood-control* target-interp fog) 1.0)
+    ;; Speed of 45.0, takes 45 seconds to reach full rain
+    (set! (-> *mood-control* speed-interp cloud) 45.0)
+    (set! (-> *mood-control* speed-interp fog) 45.0)
+    ;; Prevent random weather from interrupting the transition
+    (set-time-for-random-weather! *mood-control* 99999.0 99999.0)
+    ;; Set up security wall
+    (set! (-> self slave 30)
+      (ppointer->handle
+        (process-spawn security-wall
+          (new 'static 'vector :x (meters  -4.32) :y (meters   5.74) :z (meters  49.33) :w 1.0)
+          (new 'static 'vector :x (meters  50.56) :y (meters   5.74) :z (meters  50.41) :w 1.0)
+          (meters 33)
+          :init security-wall-init-by-other
+          :name "security-wall-genc-mercenary"
+          )
+        )
+      )
+    (set! (-> self slave 32)
+      (ppointer->handle
+        (process-spawn security-wall
+          (new 'static 'vector :x (meters 234.05) :y (meters  14.81) :z (meters 391.90) :w 1.0)
+          (new 'static 'vector :x (meters 150.22) :y (meters  14.81) :z (meters 391.90) :w 1.0)
+          (meters 33)
+          :init security-wall-init-by-other
+          :name "security-wall-genc-mercenary-2"
+          )
+        )
+      )
+    ;; Reset result screen flag  
+    (set! (-> self data-int32 5) 0)
+    ;; Mark timer as initialized
+    (set! (-> self data-int32 2) 1)
+    (none)
+    )
+  )
+
+(set-subtask-hook!
+  *game-info*
+  (game-task-node city-burning-bush-genc-mercenary-resolution)
+  TASK_MANAGER_UPDATE_HOOK
+  (lambda :behavior task-manager
+    ()
+    ;; give everything except gun-upgrade-damage
+    (logior! (-> *game-info* features) (game-feature 
+      gun gun-yellow gun-red gun-blue gun-dark 
+      board
+      gun-upgrade-speed gun-upgrade-ammo 
+      pass-red pass-green pass-yellow pass-blue 
+      darkjak darkjak-bomb0 darkjak-bomb1 darkjak-invinc darkjak-giant
+      ))
+    (logclear! (-> *game-info* features) (game-feature gun-upgrade-damage pass-red pass-green pass-yellow))
+    ;; Remove all cheats player could be using
+    (logclear! (-> *game-info* secrets) (game-secrets invulnerable))
+    (logclear! (-> *game-info* secrets) (game-secrets endless-dark))
+    (logclear! (-> *game-info* secrets) (game-secrets endless-ammo))
+    (local-vars (s5-4 object))
+    ;; Once weather has fully transitioned to heavy rain, lock it with override
+    (when (and (not (-> *mood-control* overide-weather-flag))
+              (>= (-> *mood-control* current-interp cloud) 0.99)
+              (>= (-> *mood-control* current-interp fog) 0.99)
+              )
+      (set! (-> *mood-control* overide-weather-flag) #t)
+      (set! (-> *mood-control* overide cloud) 1.0)
+      (set! (-> *mood-control* overide fog) 1.0)
+      )
+    ;; TIMER UPDATE (update timer every frame)
+    (when (nonzero? (-> self data-int32 2))
+      (let ((remaining (the-as int (- (-> self time-limit)
+                                      (- (-> *display* game-clock frame-counter)
+                                        (-> self start-time)
+                                        )
+                                      )
+                      )
+            )
+            )
+        (if (< (the-as time-frame remaining) 0)
+            (set! remaining 0)
+            )
+        (set! (-> *game-info* timer) (the-as time-frame remaining))
+        (when (zero? remaining)
+          (send-event (handle->process (-> self slave 27)) 'hide-and-die)
+          (send-event (handle->process (-> self slave 28)) 'hide-and-die)
+          (set! (-> self data-int32 5) 1) ;; Set flag to run (merc-show-results)
+          ;; (go-virtual fail)
+          )
+        )
+      )
+    ;; set current score every frame to dead guard count
+    (set! (-> *game-info* score) (the float *merc-kill-count*))
+    ;; Play sound effect when score increases
+    (when (> *merc-kill-count* *merc-prev-score*)
+      (play-sound-file "get-point.wav" (the int (* (-> *setting-control* user-current sfx-volume) 30.0)))
+      (set! *merc-prev-score* *merc-kill-count*)
+      )
+    ;; Update hud-goal with highscore
+    (let ((hi-ref (get-game-score-ref *game-info* (the-as int (game-score merc-genc)))))
+      (if (>= (-> *game-info* score) (-> hi-ref 0))
+          (set! (-> *game-info* goal) (-> *game-info* score))
+          (set! (-> *game-info* goal) (-> hi-ref 0))
+          )
+      )
+    ;; Only run transport spawning/completion when not in results screen
+    (when (zero? (-> self data-int32 6))
+      ;; Vanilla code to spawn transports etc
+      (cond
+        ((zero? (-> self data-int32 0))
+         (dotimes (gp-1 (length *merc-genc-transport-info*))
+           (let ((s5-1 (-> *merc-genc-transport-info* gp-1)))
+             (new 'stack-no-clear 'vector)
+             (new 'stack-no-clear 'vector)
+             (new 'stack-no-clear 'vector)
+             (new 'stack-no-clear 'vector)
+             0.0
+             (let ((f0-7 (vector-vector-xz-distance (target-pos 0) (-> s5-1 t-pos))))
+               (cond
+                 ((and (< f0-7 (meters 90)) (< (meters 50) f0-7)) ;; Converted to meters and increased max distance from 80 to 90 to spawn transports
+                  (when (and (not (handle->process (-> self slave gp-1))) (< (the int (-> self data-float gp-1)) (current-time)))
+                    (let ((s4-2 (new 'stack-no-clear 'transport-params)))
+                      (let ((s3-2 (new 'stack-no-clear 'vector)))
+                        (set! (-> s3-2 quad) (-> s5-1 t-pos quad))
+                        (set! (-> s4-2 spawn-pos quad) (-> s5-1 t-pos quad))
+                        (quaternion-copy! (-> s4-2 quat) (-> s5-1 t-quat))
+                        (set! (-> s4-2 max-guard) (-> s5-1 num-guard))
+                        (set! (-> s4-2 max-guard) (the-as uint 8))
+                        (set! (-> s4-2 turret?) #t)
+                        (set! (-> s4-2 speeches?) #t)
+                        (set! (-> s3-2 y) 0.0)
+                        )
+                      (let ((a0-16 (as-type (entity-nav-mesh-by-aid (the-as actor-id (-> s5-1 nav-mesh-id))) entity-nav-mesh)))
+                        (when a0-16
+                          (set! (-> s4-2 nav-mesh) (-> a0-16 nav-mesh))
+                          (set! (-> self slave gp-1) (ppointer->handle (process-spawn transport s4-2 :to self)))
+                          )
+                        )
+                      )
+                    )
+                  )
+                 ((< 368640.0 f0-7)
+                  (if (handle->process (-> self slave gp-1))
+                      (send-event (handle->process (-> self slave gp-1)) 'leave)
+                      )
+                  )
+                 )
+               )
+             )
+           (if (and (handle->process (-> self slave gp-1))
+                    (begin
+                      (let ((s5-5 #t)
+                            (a1-11 (new 'stack-no-clear 'event-message-block))
+                            )
+                        (set! (-> a1-11 from) (process->ppointer self))
+                        (set! (-> a1-11 num-params) 0)
+                        (set! (-> a1-11 message) 'guards-left)
+                        (let ((v1-75 (the-as object (send-event-function (handle->process (-> self slave gp-1)) a1-11))))
+                          (cmove-#f-nonzero s5-4 v1-75 s5-5)
+                          )
+                        )
+                      s5-4
+                      )
+                    )
+               (set! (-> self data-float gp-1) (the float (+ (current-time) (seconds 20))))
+               )
+           )
+         )
+        (else
+          (let ((gp-2 0))
+            (dotimes (s5-6 (length *merc-genc-transport-info*))
+              (when (handle->process (-> self slave s5-6))
+                (send-event (handle->process (-> self slave s5-6)) 'leave)
+                (+! gp-2 1)
+                )
+              )
+            (if (zero? gp-2)
+                (go-virtual complete)
+                )
+            )
+          )
+        )
+      )
+    (none)
+    )
+  )
+
+(set-subtask-hook!
+  *game-info*
+  (game-task-node city-burning-bush-genc-mercenary-resolution)
+  TASK_MANAGER_CODE_HOOK
+  (lambda :behavior task-manager
+    ()
+    (when (or
+            ;; Always play voice line on the very first attempt
+            (zero? (-> *game-info* sub-task-list (game-task-node city-burning-bush-genc-mercenary-resolution) death-count))
+            ;; 10% chance on all subsequent attempts
+            (rand-vu-percent? 0.1)
+            )
+      (suspend-for (seconds 3))
+      (case (the int (* (rand-vu) 2.0))
+        ;; "Jak: This is payback!"
+        ((0) (add-process *gui-control* self (gui-channel daxter) (gui-action play) "jak066" -99.0 0))
+        ;; "Daxter: We got company jak, lots of guards!"
+        ((1) (add-process *gui-control* self (gui-channel daxter) (gui-action play) "ds152" -99.0 0))
+        )
+      )
+    ;; Constantly check if the results flag is set
+    (until (nonzero? (-> self data-int32 5))
+      (suspend)
+      )
+    ;; Now run the results screen
+    (merc-show-results)
+    (none)
+    )
+  )
+
+(set-subtask-hook!
+  *game-info*
+  (game-task-node city-burning-bush-genc-mercenary-resolution)
+  TASK_MANAGER_COMPLETE_HOOK
+  (lambda :behavior task-manager () (none)) ;; no behavior as task cannot be completed anyway
+  )
+
+(set-subtask-hook!
+  *game-info*
+  (game-task-node city-burning-bush-genc-mercenary-resolution)
+  TASK_MANAGER_FAIL_HOOK
+  (lambda :behavior task-manager ()
+    (merc-show-results)
+    ;; Ignore current continue on Triangle press after dying  
+    (set-continue! *game-info* (-> self info fail-continue) #f)
+    (none)
+    )
+  )
+
+(set-subtask-hook!
+  *game-info*
+  (game-task-node city-burning-bush-genc-mercenary-resolution)
+  TASK_MANAGER_CLEANUP_HOOK
+  (lambda :behavior task-manager
+    ()
+    (set! *merc-tracking-active* #f)
+    ;; Kill timer hud 
+    (send-event (handle->process (-> self slave 27)) 'hide-and-die)
+    ;; Kill points hud
+    (send-event (handle->process (-> self slave 28)) 'hide-and-die)
+    ;; Kill high-score hud
+    (send-event (handle->process (-> self slave 31)) 'hide-and-die)
+
+    ;; Restore normal traffic settings 
+    (let ((a0-0 *traffic-manager*))
+      (send-event a0-0 'restore-default-settings)
+      )
+    
+    ;; Remove override so weather system takes over again
+    (set! (-> *mood-control* overide-weather-flag) #f)
+    ;; Set current weather to heavy rain right now
+    (set! (-> *mood-control* current-interp cloud) 1.0)
+    (set! (-> *mood-control* current-interp fog) 1.0)
+    ;; Set target to heavy rain with a slow transition speed
+    ;; so it takes a long time before the random system picks a new target
+    (set! (-> *mood-control* target-interp cloud) 1.0)
+    (set! (-> *mood-control* target-interp fog) 1.0)
+    ;; Reset the random timer to a long delay before next weather change
+    (set-time-for-random-weather! *mood-control* 18000.0 18000.0)
+    
+    ;; Remove security walls
+    (let ((wall-proc (process-by-name "security-wall-genc-mercenary" *active-pool*)))
+      (when wall-proc
+        (deactivate wall-proc)
+        )
+    )
+    (let ((wall-proc (process-by-name "security-wall-genc-mercenary-2" *active-pool*)))
+      (when wall-proc
+        (deactivate wall-proc)
+        )
+    )
+    (none)
+    )
+  )
