@@ -7,6 +7,14 @@
 
 ;; DECOMP BEGINS
 
+;; Jak the Mercenary stuff, for add combo charge, counting guard deaths etc
+(define-extern *merc-tracking-active* symbol)
+(define-extern *merc-kill-count* int)
+(define-extern *merc-combo-level* int)
+(define-extern *merc-combo-meter* float)
+(define-extern *merc-combo-leveled-up* symbol)
+(define-extern *merc-points* int)
+
 (defskelgroup skel-crimson-guard crimson-guard crimson-guard-lod0-jg -1
               ((crimson-guard-lod0-mg (meters 20)) (crimson-guard-lod2-mg (meters 999999)))
               :bounds (static-spherem 0 0 0 5)
@@ -309,6 +317,7 @@
     (crimson-guard-method-224 (_type_ vector) float)
     (crimson-guard-method-225 (_type_ uint symbol) none)
     (crimson-guard-method-226 (_type_) none)
+    (add-combo-charge (_type_ symbol) none) ;; MOD for Jak the Mercenary combo meter
     )
   )
 
@@ -500,13 +509,21 @@
      (speech-control-method-13 *speech-control* (the-as handle this))
      (logior! (-> this flags) (citizen-flag hostile))
      (let ((s1-0 (the-as process (as-type (handle->process (-> this incoming attacker-handle)) process-focusable))))
-       (when s1-0
-         (speech-control-method-12 *speech-control* this (speech-type speech-type-11))
-         (trigger-alert this 1 (the-as target s1-0))
-         )
-       )
-     ((method-of-type nav-enemy general-event-handler) this arg0 arg1 arg2 arg3)
-     )
+      (when s1-0
+        (speech-control-method-12 *speech-control* this (speech-type speech-type-11))
+        (trigger-alert this 1 (the-as target s1-0))
+        )
+      )
+    ;; Add combo charge when Jak hits a guard
+    (when (and *merc-tracking-active*
+              (= (handle->process (-> this incoming attacker-handle)) *target*)
+              )
+      (let ((attack-info (the-as attack-info (-> arg3 param 1))))
+        (add-combo-charge this (-> attack-info mode))
+        )
+      )
+    ((method-of-type nav-enemy general-event-handler) this arg0 arg1 arg2 arg3)
+    )
     (('event-death)
      (if (zero? (-> this hit-points))
          (do-effect (-> this skel effect) 'death-default 0.0 -1)
@@ -1314,9 +1331,6 @@
     )
   )
 
-(define-extern *merc-tracking-active* symbol)
-(define-extern *merc-kill-count* int)
-
 (defstate inactive (crimson-guard)
   :virtual #t
   :enter (behavior ()
@@ -1341,6 +1355,123 @@
     (logclear! (-> self flags) (citizen-flag in-pursuit hostile))
     (set! (-> self already-shot) #f)
     )
+  )
+
+;; MOD for cooldown in combo meter 
+(define *merc-last-weapons* (new 'static 'array symbol 3 #f #f #f))
+(define *merc-last-weapon-idx* 0)
+(define *merc-weapon-hit-counts* (new 'static 'array int32 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0))
+(define *merc-weapon-hit-times* (new 'static 'array time-frame 14 0 0 0 0 0 0 0 0 0 0 0 0 0 0))
+
+;; Helper function for add-combo-charge
+(defun get-weapon-index ((attack-mode symbol))
+  (cond
+    ((= attack-mode 'punch)      0)
+    ((= attack-mode 'uppercut)   1)
+    ((= attack-mode 'spin)       2)
+    ((= attack-mode 'flop)       3)
+    ((= attack-mode 'darkjak)    4)
+    ((= attack-mode 'bomb)       5)
+    ((= attack-mode 'ice)        6)
+    ((= attack-mode 'eco-yellow) 7)
+    ((= attack-mode 'eco-red)    8)
+    ((= attack-mode 'eco-blue)   9)
+    ((= attack-mode 'eco-dark)   10)
+    ((= attack-mode 'board)      11)
+    ((= attack-mode 'board-spin) 12)
+    (else                        13)
+    )
+  )
+
+;; Added in Jak the Mercenary mod, gives charge to combo meter when a guard is hit 
+(defmethod add-combo-charge ((this crimson-guard) (attack-mode symbol))
+  (when *merc-tracking-active*
+    (let* ((base-charge (cond
+                    ((= attack-mode 'punch)    (if (and *target* (focus-test? *target* dark))
+                                                      2.0   ;; Darkjak
+                                                      1.0)) ;; Normal Jak
+                    ((= attack-mode 'uppercut) (if (and *target* (focus-test? *target* dark))
+                                                      2.0   ;; Darkjak
+                                                      1.4)) ;; Normal Jak
+                    ((= attack-mode 'spin)     (if (and *target* (focus-test? *target* dark))
+                                                      2.0   ;; Darkjak
+                                                      1.0)) ;; Normal Jak
+                    ((= attack-mode 'flop)     (if (and *target* (focus-test? *target* dark))
+                                                      2.0   ;; Darkjak
+                                                      1.6)) ;; Normal Jak
+                    ((= attack-mode 'darkjak)         0.75) ;; From darkjak invincibility
+                    ((= attack-mode 'bomb)            2.0)  ;; Dark bomb 
+                    ((= attack-mode 'ice)             2.0)  ;; Dark blast (idk why its called ice)
+                    ((= attack-mode 'eco-yellow)      1.2) 
+                    ((= attack-mode 'eco-red)         1.4)
+                    ((= attack-mode 'eco-blue)        0.7)
+                    ((= attack-mode 'eco-dark)        1.8)
+                    ((= attack-mode 'board)           1.0)
+                    ((= attack-mode 'board-spin)      2.5)
+                    (else                             1.0)
+                    )
+                  )
+           ;; Max hits before weapon gives 0 charge — adjust per weapon
+           (max-hits (cond
+                       ((= attack-mode 'punch)      30)  
+                       ((= attack-mode 'uppercut)   30)  
+                       ((= attack-mode 'spin)       30)  
+                       ((= attack-mode 'flop)       30)   
+                       ((= attack-mode 'darkjak)    30)  
+                       ((= attack-mode 'bomb)       30)   
+                       ((= attack-mode 'ice)        30)   
+                       ((= attack-mode 'eco-yellow) 30)  
+                       ((= attack-mode 'eco-red)    30)  
+                       ((= attack-mode 'eco-blue)   45)  
+                       ((= attack-mode 'eco-dark)   30)  
+                       ((= attack-mode 'board)      30)  
+                       ((= attack-mode 'board-spin) 30)   
+                       (else                        30)
+                       )
+                     )
+            (idx        (get-weapon-index attack-mode))
+            (hit-count  (let ((raw-count (-> *merc-weapon-hit-counts* idx)))
+                          ;; Reset if 15 seconds have passed since first hit
+                          (when (and (> raw-count 0)
+                                    (>= (- (-> *display* game-clock frame-counter) (-> *merc-weapon-hit-times* idx))
+                                        (seconds 15))
+                                    )
+                            (set! (-> *merc-weapon-hit-counts* idx) 0)
+                            (set! (-> *merc-weapon-hit-times* idx) 0)
+                            )
+                          (-> *merc-weapon-hit-counts* idx)
+                          )
+              )
+           ;; Scale loss per hit based on max-hits so all weapons reach 0 at their own pace
+           (cooldown-mult (fmax 0.0 (- 1.0 (* (the float hit-count) (/ 1.0 (the float max-hits))))))
+           )
+      ;; Record first hit time if this weapon was at 0
+      (when (= (-> *merc-weapon-hit-counts* idx) 0)
+        (set! (-> *merc-weapon-hit-times* idx) (-> *display* game-clock frame-counter))
+        )
+      (set! (-> *merc-weapon-hit-counts* idx) (min max-hits (+ hit-count 1)))
+      (dotimes (i 14)
+        (when (!= i idx)
+          (set! (-> *merc-weapon-hit-counts* i) (max 0 (- (-> *merc-weapon-hit-counts* i) 1)))
+          )
+        )
+      (+! *merc-combo-meter* (* base-charge cooldown-mult))
+      )
+    )
+  (none)
+  )
+
+;; Added in Jak the Mercenary mod, for counting guard deaths to the point counter 
+(defmethod cleanup-for-death ((this crimson-guard))
+  ;; zero hit-points = combat death, not a despawn/leave
+  (when (and *merc-tracking-active* (zero? (-> this hit-points)))
+  (+! *merc-kill-count* 1)
+  ;; Add points at time of death (1 x 200 x current combo level)
+  (+! *merc-points* (* 200 *merc-combo-level*))
+  )
+  ;; always call through to the real cleanup so nothing else breaks
+  ((method-of-type enemy cleanup-for-death) this)
+  (none)
   )
 
 (defmethod crimson-guard-method-217 ((this crimson-guard) (arg0 vector) (arg1 vector) (arg2 vector))
