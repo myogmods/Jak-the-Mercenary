@@ -336,6 +336,7 @@
 ;; to also generate a collide-mesh, add :gen-mesh #t
 (build-actor "test-actor" :force-run #t :gen-mesh #t)
 (build-actor "merc-darkeco-barrel" :force-run #t :gen-mesh #t)
+(build-actor "clock-green-30s" :force-run #t :gen-mesh #t)
 (build-actor "clock-blue-50s" :force-run #t :gen-mesh #t)
 (build-actor "clock-gold-90s" :force-run #t :gen-mesh #t)
 
