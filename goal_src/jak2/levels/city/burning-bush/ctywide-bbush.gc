@@ -2763,11 +2763,11 @@
       :time 9000.0
       )
     (new 'static 'burning-bush-get-on-info
-      :trans (new 'static 'vector :x 2543148.8 :y 37827.38 :z 3158161.5 :w 1.0)
-      :quat (new 'static 'quaternion :y -0.9581 :w 0.2863)
-      :camera-trans (new 'static 'vector :x 2513162.2 :y 68558.03 :z 3066508.5 :w 1.0)
-      :camera-rot (new 'static 'array float 9 0.9036 0.0 -0.4281 0.1063 0.9686 0.2244 0.4147 -0.2483 0.8753)
-      :time 9000.0
+      :trans (new 'static 'vector :x (meters 580.03) :y (meters  10.01) :z (meters 756.63) :w 1.0)
+      :quat (new 'static 'quaternion :y -0.9923 :w 0.1235)
+      :camera-trans (new 'static 'vector :x (meters 591.1644) :y (meters 14.5382) :z (meters 756.1370) :w 1.0)
+      :camera-rot (new 'static 'array float 9 0.1131 -0.0000 0.9935 -0.1495 0.9886 0.0170 -0.9822 -0.1505 0.1118)
+      :time 7500.0
       )
     (new 'static 'burning-bush-get-on-info
       :trans (new 'static 'vector :x 1663103.0 :y 34921.266 :z 2111440.0 :w 1.0)
