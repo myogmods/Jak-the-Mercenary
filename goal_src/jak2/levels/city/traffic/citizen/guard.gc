@@ -319,6 +319,7 @@
     (crimson-guard-method-226 (_type_) none)
     (add-combo-charge (_type_ symbol) none) ;; MOD for Jak the Mercenary combo meter
     (go-flee (_type_) object) ;; MOD For guards to run away from Jak during mercenary results screen
+    (trigger-alert (_type_ int target) none)
     )
   )
 
@@ -499,6 +500,15 @@
     (-> arg1 param 1)
     v0-0
     )
+  )
+
+;; Mod added in Jak the Mercenary so fleeing guards don't trigger alert
+(defmethod trigger-alert ((this crimson-guard) (arg0 int) (arg1 target))
+  (when (not (-> this was-fleeing))
+    ((method-of-type citizen trigger-alert) this arg0 arg1)
+    )
+  0
+  (none)
   )
 
 ;; WARN: disable def twice: 122. This may happen when a cond (no else) is nested inside of another conditional, but it should be rare.
@@ -1417,24 +1427,24 @@
   (when *merc-tracking-active*
     (let* ((base-charge (cond
                     ((= attack-mode 'punch)    (if (and *target* (focus-test? *target* dark))
-                                                      2.0   ;; Darkjak
-                                                      1.0)) ;; Normal Jak
+                                                      2.5   ;; Darkjak
+                                                      0.6)) ;; Normal Jak
                     ((= attack-mode 'uppercut) (if (and *target* (focus-test? *target* dark))
-                                                      2.0   ;; Darkjak
-                                                      1.4)) ;; Normal Jak
+                                                      2.5   ;; Darkjak
+                                                      0.8)) ;; Normal Jak
                     ((= attack-mode 'spin)     (if (and *target* (focus-test? *target* dark))
-                                                      2.0   ;; Darkjak
-                                                      1.0)) ;; Normal Jak
+                                                      2.5   ;; Darkjak
+                                                      0.6)) ;; Normal Jak
                     ((= attack-mode 'flop)     (if (and *target* (focus-test? *target* dark))
-                                                      2.0   ;; Darkjak
+                                                      2.5   ;; Darkjak
                                                       1.6)) ;; Normal Jak
                     ((= attack-mode 'darkjak)         0.75) ;; From darkjak invincibility
-                    ((= attack-mode 'bomb)            2.0)  ;; Dark bomb 
-                    ((= attack-mode 'ice)             2.0)  ;; Dark blast (idk why its called ice)
+                    ((= attack-mode 'bomb)            2.5)  ;; Dark bomb 
+                    ((= attack-mode 'ice)             2.5)  ;; Dark blast (idk why its called ice)
                     ((= attack-mode 'eco-yellow)      1.2) 
                     ((= attack-mode 'eco-red)         1.4)
-                    ((= attack-mode 'eco-blue)        0.7)
-                    ((= attack-mode 'eco-dark)        1.8)
+                    ((= attack-mode 'eco-blue)        0.8)
+                    ((= attack-mode 'eco-dark)        2.0)
                     ((= attack-mode 'board)           1.0)
                     ((= attack-mode 'board-spin)      2.5)
                     (else                             1.0)
@@ -1442,9 +1452,9 @@
                   )
            ;; Max hits before weapon gives 0 charge — adjust per weapon
            (max-hits (cond
-                       ((= attack-mode 'punch)      30)  
-                       ((= attack-mode 'uppercut)   30)  
-                       ((= attack-mode 'spin)       30)  
+                       ((= attack-mode 'punch)      25)  
+                       ((= attack-mode 'uppercut)   25)  
+                       ((= attack-mode 'spin)       25)  
                        ((= attack-mode 'flop)       30)   
                        ((= attack-mode 'darkjak)    30)  
                        ((= attack-mode 'bomb)       30)   
@@ -1495,8 +1505,8 @@
   ;; zero hit-points = combat death, not a despawn/leave
   (when (and *merc-tracking-active* (zero? (-> this hit-points)))
   (+! *merc-kill-count* 1)
-  ;; Add points at time of death (1 x 200 x current combo level)
-  (+! *merc-points* (* 200 *merc-combo-level*))
+  ;; Add points at time of death (1 x 300 x current combo level)
+  (+! *merc-points* (* 300 *merc-combo-level*))
   )
   ;; always call through to the real cleanup so nothing else breaks
   ((method-of-type enemy cleanup-for-death) this)
@@ -3879,12 +3889,12 @@
   (set! (-> this fact pickup-type) (pickup-type ammo-random))
   (set! (-> this fact pickup-amount) 10.0)
   (set! (-> this fact pickup-spawn-amount) 1.0)
-  ;; 3% chance to drop health in mercenary missions
+  ;; 2% chance to drop health in mercenary missions
   (when (and (or (= (level-status *level* 'merc-slumc) 'active)
                  (= (level-status *level* 'merc-genc)  'active)
                  (= (level-status *level* 'merc-markb) 'active)
                  )
-             (rand-vu-percent? 0.03)
+             (rand-vu-percent? 0.02)
              )
         (set! (-> this fact pickup-type) (pickup-type health))
         (set! (-> this fact pickup-amount) 2.0)

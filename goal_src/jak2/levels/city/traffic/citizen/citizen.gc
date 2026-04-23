@@ -160,15 +160,7 @@
 (defmethod trigger-alert ((this citizen) (arg0 int) (arg1 target))
   (let ((a0-1 (-> this controller traffic)))
     (when (and (nonzero? a0-1) arg1)
-      ;; Don't trigger alert if this is a crimson-guard that is fleeing or was fleeing
-      (when (not (and (type? this crimson-guard)
-                      (or (and (-> this state) (= (-> this state name) 'flee))
-                          (-> (the-as crimson-guard this) was-fleeing)
-                          )
-                      )
-                 )
-        (increase-alert-level a0-1 arg0 arg1)
-        )
+      (increase-alert-level a0-1 arg0 arg1)
       )
     )
   0
