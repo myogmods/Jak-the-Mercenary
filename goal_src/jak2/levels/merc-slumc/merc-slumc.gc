@@ -522,9 +522,6 @@
     )
   )
 
-(define *merc-tracking-active* #f)
-(define *merc-kill-count* 0)
-
 (defbehavior security-wall-init-by-other security-wall ((pt0 vector) (pt1 vector) (height float))
   (set! (-> self breach) #f)
   (set! (-> self pass) 0)  ;; pass 0 never matches any pass-feature check — wall stays permanently closed
@@ -800,6 +797,14 @@
                                       )
         )
 
+(define *merc-tracking-active* #f)
+(define *merc-kill-count* 0)
+(define *merc-points* 0)
+(define *merc-combo-level* 1)
+(define *merc-combo-meter* (the float 0.0))
+(define *merc-combo-proc* (the-as handle #f))
+(define *merc-prev-score* 0) ;; Variable to count previous score to play sound
+
 (defbehavior merc-show-rules task-manager ()
   (logior! (-> *game-info* secrets) (game-secrets invulnerable))
   (until (process-grab? *target* #f) (suspend))
@@ -831,19 +836,25 @@
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; Destroy as many guards line
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 160 0.0 (font-color default) (font-flags shadow kerning middle large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 175 0.0 (font-color default) (font-flags shadow kerning middle large))))
         (set! (-> font-ctx scale) 0.4)
         (pc-encode-utf8-string (string-format "Destroy as many guards as you can within the time limit!") *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
+      ;; Use variety of attacks line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 215 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.4)
+        (pc-encode-utf8-string (string-format "Use a variety of attacks to multiply your score!") *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
       ;; Collect clocks line
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 200 0.0 (font-color default) (font-flags shadow kerning middle large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 255 0.0 (font-color default) (font-flags shadow kerning middle large))))
         (set! (-> font-ctx scale) 0.4)
         (pc-encode-utf8-string (string-format "Collect clock items for extra time!") *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; Go for high score line
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 240 0.0 (font-color default) (font-flags shadow kerning middle large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 295 0.0 (font-color default) (font-flags shadow kerning middle large))))
         (set! (-> font-ctx scale) 0.4)
         (pc-encode-utf8-string (string-format "Aim for the high-score!") *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
@@ -867,6 +878,11 @@
 
 (defbehavior merc-show-results task-manager ()
   ;; Kill HUDs
+  (let ((combo-proc (process-by-name "merc-combo-meter" *active-pool*)))
+    (when combo-proc
+      (deactivate combo-proc)
+      )
+    )
   (send-event (handle->process (-> self slave 27)) 'hide-and-die)
   (send-event (handle->process (-> self slave 28)) 'hide-and-die)
   (send-event (handle->process (-> self slave 31)) 'hide-and-die)
@@ -904,21 +920,27 @@
       )
   )
   ;; Compute rank
-  (let* ((kills       (the int (-> *game-info* score)))
+  (let* ((points       (the int (-> *game-info* score)))
+         (guard-kills *merc-kill-count*)
          (hi-score    (the int (-> (get-game-score-ref *game-info* (the-as int (game-score merc-slumc))) 0)))
          (rank-string (cond
-                        ((>= kills 500) "Renegade")
-                        ((>= kills 400) "Our Hero!")
-                        ((>= kills 300) "Heir of Mar")
-                        ((>= kills 200) "Underground Fighter")
-                        ((>= kills 100) "Time Traveller")
-                        ((>= kills 50)  "Brave Adventurer")
-                        (else           "Villager")
+                        ((>= points 650000) "Renegade")
+                        ((>= points 600000) "Heir of Mar")
+                        ((>= points 550000) "The Chosen One")
+                        ((>= points 500000) "Dark Warrior")
+                        ((>= points 450000) "Revolutionary")
+                        ((>= points 400000) "Underground Fighter")
+                        ((>= points 350000) "Rogue")
+                        ((>= points 200000) "Krew's Errand Boys")
+                        ((>= points 150000) "Prison Escapee")
+                        ((>= points 100000) "Time Traveller")
+                        ((>= points 50000)  "Brave Adventurer")
+                        (else               "Villager")
                       )
          )
         )
     ;; Play jingle if this run is a new high score
-    (when (>= kills hi-score)
+    (when (>= points hi-score)
       (play-sound-file "item-obtained.mp3" (the int (* (-> *setting-control* user-current sfx-volume) 200.0)))
       )
     (until (or (cpad-pressed? 0 confirm) (cpad-pressed? 0 triangle))
@@ -936,19 +958,25 @@
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; High Score line
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 160 0.0 (font-color default) (font-flags shadow kerning middle large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 130 0.0 (font-color default) (font-flags shadow kerning middle large))))
         (set! (-> font-ctx scale) 0.6)
         (pc-encode-utf8-string (string-format "High Score: ~D" hi-score) *pc-encoded-temp-string*)
+        (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+        )
+      ;; High Score line
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 170 0.0 (font-color default) (font-flags shadow kerning middle large))))
+        (set! (-> font-ctx scale) 0.6)
+        (pc-encode-utf8-string (string-format "Kills: ~D" guard-kills) *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; Total Points line
       (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 210 0.0 (font-color default) (font-flags shadow kerning middle large))))
         (set! (-> font-ctx scale) 0.6)
-        (pc-encode-utf8-string (string-format "Total Points: ~D" kills) *pc-encoded-temp-string*)
+        (pc-encode-utf8-string (string-format "Total Points: ~D" points) *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
         )
       ;; Rank line
-      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 260 0.0 (font-color default) (font-flags shadow kerning middle large))))
+      (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 270 250 0.0 (font-color default) (font-flags shadow kerning middle large))))
         (set! (-> font-ctx scale) 0.6)
         (pc-encode-utf8-string (string-format "Rank: ~S" rank-string) *pc-encoded-temp-string*)
         (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
@@ -971,7 +999,7 @@
   )
     (suspend)
     )
-    ;; Capture button press BEFORE releasing control
+  ;; Capture button press BEFORE releasing control
   (let ((pressed-confirm (cpad-pressed? 0 confirm)))
   ;; Clear the X button press so Jak doesn't jump when control is restored
   (logclear! (-> *cpad-list* cpads 0 button0-abs 0) (pad-buttons confirm x))
@@ -980,7 +1008,7 @@
   (until (process-release? *target*)
     (suspend)
     )
-  
+  ;; Run x press logic to retry
   (if pressed-confirm
       ;; X — retry mission
       (let ((a1-0 (new 'stack-no-clear 'fail-mission-params)))
@@ -997,7 +1025,7 @@
           (suspend)
           )
         )
-      ;; Triangle - close task node and reopen it, ending task on the spot 
+      ;; Run Δ press logic: close task node and reopen it, ending task on the spot but making replayable 
       (and (task-node-close! (game-task-node city-burning-bush-slumc-mercenary-resolution))
            (task-node-open! (game-task-node city-burning-bush-slumc-mercenary-introduction))
       )
@@ -1006,9 +1034,6 @@
   )
   (none)
 )
-
-;; Variable to count previous score to play sound 
-(define *merc-prev-score* 0)
 
 (set-subtask-hook!
   *game-info*
@@ -1129,25 +1154,108 @@
     (dotimes (gp-1 (length *merc-slumc-transport-info*))
       (set! (-> *merc-slumc-transport-info* gp-1 spawned) #f)
       )
-    (set! *merc-kill-count* 0) ;; Counts dead guards
+    (set! *merc-kill-count* 0) ;; Counts guard deaths as kills 
+    (set! *merc-points* 0)     ;; Points meter for the task gets set to 0 at start 
     (set! *merc-prev-score* 0) ;; Variable to count previous score to play sound, setting to 0 here
-    (set! *merc-tracking-active* #t)
+    (set! *merc-combo-level* 1) ;; Combo level reset to lv1
+    (set! *merc-combo-meter* 0.0) ;; Combo meter reset to 0.0
+    (set! *merc-tracking-active* #t) ;; Start counting guard deaths for kills and points 
     (set! (-> self data-int32 0) 0)  ;; mission transport dead completion flag
     (set! (-> self data-int32 1) 0)  ;; blocking plane spawned flag
     (set! (-> self data-int32 2) 0)  ;; first-frame init flag
     (set! (-> self data-int32 3) 0)  ;; kill count
     (set! (-> self data-int32 4) 0)  ;; prev dead guards
     (set! (-> self data-int32 6) 0)  ;; keep spawn transports flag
-    (set! (-> *game-info* score) 0.0)
+    (set! (-> *game-info* score) 0.0) ;; Reset current score to 0.0
     (set! (-> *game-info* goal) (-> (get-game-score-ref *game-info* (the-as int (game-score merc-slumc))) 0))
+    (dotimes (i 3) ;; Reset combo meter parameters
+      (set! (-> *merc-last-weapons* i) #f)
+      )
+    (dotimes (i 14)
+      (set! (-> *merc-weapon-hit-counts* i) 0)
+      (set! (-> *merc-weapon-hit-times* i) 0)
+      )
+    (set! *merc-last-weapon-idx* 0)
     (set! (-> self start-time) (-> *display* game-clock frame-counter))
-    (set! (-> self time-limit) (seconds 120))
+    (set! (-> self time-limit) (seconds 12))
     (set! (-> self slave 27)
           (ppointer->handle (process-spawn hud-timer :init hud-init-by-other :to self)))
     (set! (-> self slave 28)
           (ppointer->handle (process-spawn hud-score :init hud-init-by-other :to self)))
     (set! (-> self slave 31)
           (ppointer->handle (process-spawn hud-goal :init hud-init-by-other :to self)))
+    ;; Draw combo multiplier text and meter
+    (set! *merc-combo-proc*
+      (ppointer->handle
+        (process-spawn-function process
+      (lambda :behavior process ()
+        (set! (-> self mask) (process-mask menu))
+        (set! (-> self clock) (-> *display* real-clock))
+        (loop
+          (when (not *progress-process*)
+            (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
+                                        (bucket-id debug-no-zbuf1))
+              (dma-buffer-add-gs-set-flusha buf
+                (alpha-1 (new 'static 'gs-alpha :b #x1 :d #x1))
+                (tex1-1 (new 'static 'gs-tex1 :mmag #x1 :mmin #x1)))
+              (let* ((combo-level *merc-combo-level*)
+                    (font-col (cond
+                                ((= combo-level 1) (font-color white))
+                                ((= combo-level 2) (font-color blue))
+                                ((= combo-level 3) (font-color cyan))
+                                ((= combo-level 4) (font-color green))
+                                ((= combo-level 5) (font-color yellow))
+                                ((= combo-level 6) (font-color orange))
+                                (else              (font-color red))
+                                )
+                              )
+                    (bar-col (cond
+                                ((= combo-level 1) (new 'static 'rgba :r 255 :g 255 :b 255 :a 128)) ;; white
+                                ((= combo-level 2) (new 'static 'rgba :r 60  :g 120 :b 255 :a 128)) ;; blue
+                                ((= combo-level 3) (new 'static 'rgba :r 0   :g 255 :b 255 :a 128)) ;; cyan
+                                ((= combo-level 4) (new 'static 'rgba :r 0   :g 255 :b 0   :a 128)) ;; green
+                                ((= combo-level 5) (new 'static 'rgba :r 255 :g 255 :b 0   :a 128)) ;; yellow
+                                ((= combo-level 6) (new 'static 'rgba :r 255 :g 165 :b 0   :a 128)) ;; orange
+                                (else              (new 'static 'rgba :r 255 :g 0   :b 0   :a 128)) ;; red
+                                )
+                              )
+                    )
+                ;; Use font-col for text
+                (let ((font-ctx (new 'stack 'font-context *font-default-matrix* 387 178 0.0 font-col (font-flags shadow kerning large))))
+                  (set! (-> font-ctx scale) 0.25)
+                  (pc-encode-utf8-string (string-format "x~D Combo" *merc-combo-level*) *pc-encoded-temp-string*)
+                  (draw-string-adv *pc-encoded-temp-string* buf font-ctx)
+                  )
+                (let* ((score-proc (process-by-name "hud-score" *active-pool*))
+                      (score-hud  (the-as hud-score score-proc))
+                      )
+                  (when score-hud
+                    (let* ((sprite-x  (-> score-hud sprites 0 pos x))
+                          (sprite-y  (-> score-hud sprites 0 pos y))
+                          (scale    (/ 0.1 (-> *pc-settings* width) ))  ;; try adjusting this
+                          (bar-x     (the int (+ (* (the float sprite-x) scale) 387)))
+                          (bar-y     (the int (+ (* (the float sprite-y) scale) 172)))
+                          (level-min (* (- *merc-combo-level* 1) 5.0))
+                          (progress  (fmin 1.0 (/ (- *merc-combo-meter* level-min) 5.0)))
+                          (fill-w    (max 0 (min 90 (the int (* 90.0 progress)))))
+                          )
+                      (draw-sprite2d-xy buf bar-x bar-y 90 4 *color-gray*)
+                      ;; Use bar-col for sprite
+                      (draw-sprite2d-xy buf bar-x bar-y fill-w 4 bar-col)
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          (suspend)
+          )
+            )
+      :to *entity-pool*
+      :name "merc-combo-meter"
+      )
+    )
+  )
     ;; Set up stats to be consistent each time 
       (set! (-> *game-info* eco-pill-dark) 0.0)
       (set! (-> *game-info* gun-ammo 0) (-> *FACT-bank* ammo-yellow-start))
@@ -1234,8 +1342,38 @@
           )
         )
       )
-    ;; set current score every frame to dead guard count
-    (set! (-> *game-info* score) (the float *merc-kill-count*))
+    ;; Decay speed of combo meter based on current level
+    (let ((decay-rate (cond
+                        ((>= *merc-combo-meter* 30.0) 2.00)  ;; lv7 
+                        ((>= *merc-combo-meter* 25.0) 1.75)  ;; lv6
+                        ((>= *merc-combo-meter* 20.0) 1.50)  ;; lv5
+                        ((>= *merc-combo-meter* 15.0) 1.25)  ;; lv4
+                        ((>= *merc-combo-meter* 10.0) 1.00)  ;; lv3
+                        ((>= *merc-combo-meter* 5.0)  0.75)  ;; lv2
+                        (else                         0.50)  ;; lv1
+                        )
+                      )
+          )
+      ;; Decay combo meter
+      (set! *merc-combo-meter* (fmax 0.0 (- *merc-combo-meter* (* (seconds-per-frame) decay-rate))))
+      )
+    ;; Cap meter at max level 7 full bar
+    (set! *merc-combo-meter* (fmin 35.0 *merc-combo-meter*))
+    ;; Level derived directly from meter value
+    (set! *merc-combo-level* (cond
+      ((>= *merc-combo-meter* 30.0) 7)
+      ((>= *merc-combo-meter* 25.0) 6)
+      ((>= *merc-combo-meter* 20.0) 5)
+      ((>= *merc-combo-meter* 15.0) 4)
+      ((>= *merc-combo-meter* 10.0) 3)
+      ((>= *merc-combo-meter* 5.0)  2)
+      (else                         1)
+      ))
+    ;; ;; Points = kills * 250 * combo level
+    ;; (set! *merc-points* (* *merc-kill-count* 250 *merc-combo-level*))
+    (set! (-> *game-info* score) (the float *merc-points*))
+    ;; Fill based on progress toward next level threshold
+    (the int (* 90.0 (/ (- *merc-combo-meter* (* (- *merc-combo-level* 1) 5.0)) 5.0)))
     ;; Play sound effect when score increases
     (when (> *merc-kill-count* *merc-prev-score*)
       (play-sound-file "get-point.wav" (the int (* (-> *setting-control* user-current sfx-volume) 30.0)))
@@ -1392,7 +1530,10 @@
     (send-event (handle->process (-> self slave 28)) 'hide-and-die)
     ;; Kill high-score hud
     (send-event (handle->process (-> self slave 31)) 'hide-and-die)
-
+    ;; Kill combo hud
+    (when (handle->process *merc-combo-proc*)
+      (deactivate (handle->process *merc-combo-proc*))
+      )
     ;; Restore normal traffic settings 
     (let ((a0-0 *traffic-manager*))
       (send-event a0-0 'restore-default-settings)

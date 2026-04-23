@@ -796,7 +796,7 @@
 (define *merc-combo-level* 1)
 (define *merc-combo-meter* (the float 0.0))
 (define *merc-combo-proc* (the-as handle #f))
-(define *merc-combo-leveled-up* #f)
+(define *merc-prev-score* 0) ;; Variable to count previous score to play sound
 
 (defbehavior merc-show-rules task-manager ()
   (logior! (-> *game-info* secrets) (game-secrets invulnerable))
@@ -917,10 +917,15 @@
          (guard-kills *merc-kill-count*)
          (hi-score    (the int (-> (get-game-score-ref *game-info* (the-as int (game-score merc-markb))) 0)))
          (rank-string (cond
-                        ((>= points 500000) "Renegade")
-                        ((>= points 400000) "Our Hero!")
-                        ((>= points 300000) "Heir of Mar")
-                        ((>= points 200000) "Underground Fighter")
+                        ((>= points 650000) "Renegade")
+                        ((>= points 600000) "Heir of Mar")
+                        ((>= points 550000) "The Chosen One")
+                        ((>= points 500000) "Dark Warrior")
+                        ((>= points 450000) "Revolutionary")
+                        ((>= points 400000) "Underground Fighter")
+                        ((>= points 350000) "Rogue")
+                        ((>= points 200000) "Krew's Errand Boys")
+                        ((>= points 150000) "Prison Escapee")
                         ((>= points 100000) "Time Traveller")
                         ((>= points 50000)  "Brave Adventurer")
                         (else               "Villager")
@@ -996,8 +1001,6 @@
   (until (process-release? *target*)
     (suspend)
     )
-  ;; Make Jak visible to guards again 
-  (when *target* (logior! (-> *target* mask) (process-mask target)))
   ;; Run x press logic to retry
   (if pressed-confirm
       ;; X — retry mission
@@ -1152,16 +1155,16 @@
     (set! *merc-kill-count* 0) ;; Counts guard deaths as kills 
     (set! *merc-points* 0)     ;; Points meter for the task gets set to 0 at start 
     (set! *merc-prev-score* 0) ;; Variable to count previous score to play sound, setting to 0 here
-    (set! *merc-combo-level* 1)
-    (set! *merc-combo-meter* 0.0)
-    (set! *merc-tracking-active* #t)
+    (set! *merc-combo-level* 1) ;; Combo level reset to lv1
+    (set! *merc-combo-meter* 0.0) ;; Combo meter reset to 0.0
+    (set! *merc-tracking-active* #t) ;; Start counting guard deaths for kills and points 
     (set! (-> self data-int32 0) 0)  ;; mission transport dead completion flag
     (set! (-> self data-int32 1) 0)  ;; blocking plane spawned flag
     (set! (-> self data-int32 2) 0)  ;; first-frame init flag
     (set! (-> self data-int32 3) 0)  ;; kill count
     (set! (-> self data-int32 4) 0)  ;; prev dead guards
     (set! (-> self data-int32 6) 0)  ;; keep spawn transports flag
-    (set! (-> *game-info* score) 0.0)
+    (set! (-> *game-info* score) 0.0) ;; Reset current score to 0.0
     (set! (-> *game-info* goal) (-> (get-game-score-ref *game-info* (the-as int (game-score merc-markb))) 0))
     (dotimes (i 3) ;; Reset combo meter parameters
       (set! (-> *merc-last-weapons* i) #f)
@@ -1450,9 +1453,6 @@
     )
   )
 
-;; Variable to count previous score to play sound 
-(define *merc-prev-score* 0)
-
 (set-subtask-hook!
   *game-info*
   (game-task-node city-burning-bush-markb-mercenary-resolution)
@@ -1504,7 +1504,7 @@
           )
         )
       )
-    ;; Decay speed based on current level
+    ;; Decay speed of combo meter based on current level
     (let ((decay-rate (cond
                         ((>= *merc-combo-meter* 30.0) 2.00)  ;; lv7 
                         ((>= *merc-combo-meter* 25.0) 1.75)  ;; lv6
@@ -1536,7 +1536,6 @@
     (set! (-> *game-info* score) (the float *merc-points*))
     ;; Fill based on progress toward next level threshold
     (the int (* 90.0 (/ (- *merc-combo-meter* (* (- *merc-combo-level* 1) 5.0)) 5.0)))
-    
     ;; Play sound effect when kill count increases
     (when (> *merc-kill-count* *merc-prev-score*)
       (play-sound-file "get-point.wav" (the int (* (-> *setting-control* user-current sfx-volume) 30.0)))
