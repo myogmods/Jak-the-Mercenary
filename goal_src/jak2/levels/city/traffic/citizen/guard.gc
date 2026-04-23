@@ -12,7 +12,6 @@
 (define-extern *merc-kill-count* int)
 (define-extern *merc-combo-level* int)
 (define-extern *merc-combo-meter* float)
-(define-extern *merc-combo-leveled-up* symbol)
 (define-extern *merc-points* int)
 
 (defskelgroup skel-crimson-guard crimson-guard crimson-guard-lod0-jg -1
@@ -3780,6 +3779,16 @@
   (set! (-> this fact pickup-type) (pickup-type ammo-random))
   (set! (-> this fact pickup-amount) 10.0)
   (set! (-> this fact pickup-spawn-amount) 1.0)
+  ;; 3% chance to drop health in mercenary missions
+  (when (and (or (= (level-status *level* 'merc-slumc) 'active)
+                 (= (level-status *level* 'merc-genc)  'active)
+                 (= (level-status *level* 'merc-markb) 'active)
+                 )
+             (rand-vu-percent? 0.03)
+             )
+        (set! (-> this fact pickup-type) (pickup-type health))
+        (set! (-> this fact pickup-amount) 2.0)
+    )
   (set! (-> this traffic-target-status handle) (the-as handle #f))
   (let ((v1-24 (rnd-int-count this 2)))
     (cond
