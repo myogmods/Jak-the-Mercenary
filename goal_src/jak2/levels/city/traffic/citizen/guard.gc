@@ -286,6 +286,7 @@
    (traffic-target-status    traffic-target-status  :inline)
    (minimap                  connection-minimap)
    (other-side               symbol)
+   (was-fleeing              symbol) ;; MOD to stop alert after hurting fleeing guard
    )
   (:state-methods
     get-up-front
@@ -317,6 +318,7 @@
     (crimson-guard-method-225 (_type_ uint symbol) none)
     (crimson-guard-method-226 (_type_) none)
     (add-combo-charge (_type_ symbol) none) ;; MOD for Jak the Mercenary combo meter
+    (go-flee (_type_) object) ;; MOD For guards to run away from Jak during mercenary results screen
     )
   )
 
@@ -679,6 +681,9 @@
            )
          )
        )
+     )
+    (('go-flee)
+     (go-flee this)
      )
     (else
       ((method-of-type citizen general-event-handler) this arg0 arg1 arg2 arg3)
@@ -1182,6 +1187,11 @@
 
 ;; WARN: Return type mismatch int vs object.
 (defmethod go-hostile ((this crimson-guard))
+  ;; Do nothing if guard had was-fleeing field true
+  (when (-> this was-fleeing)
+    (go (method-of-object this flee))
+    (return 0)
+    )
   (cond
     ((handle->process (-> this focus handle))
      (logior! (-> this flags) (citizen-flag hostile))
@@ -1204,6 +1214,26 @@
       )
     )
   0
+  )
+
+(defmethod go-flee ((this crimson-guard))
+  (when (-> this nav)
+    (let ((v1-0 (-> this nav)))
+      (set! (-> v1-0 target-speed) (* (-> this speed-scale) (-> this enemy-info run-travel-speed)))
+      )
+    0
+    )
+  ;; Explicitly enable nav movement flag
+  (let ((v1-1 this))
+    (if (not (logtest? (enemy-flag enemy-flag36) (-> v1-1 enemy-flags)))
+        (set! (-> v1-1 enemy-flags) (the-as enemy-flag (logior (enemy-flag enemy-flag38) (-> v1-1 enemy-flags))))
+        )
+    (set! (-> v1-1 enemy-flags) (the-as enemy-flag (logior (enemy-flag enemy-flag36) (-> v1-1 enemy-flags))))
+    (set! (-> v1-1 nav callback-info) (-> v1-1 enemy-info callback-info))
+    )
+  0
+  (logclear! (-> this flags) (citizen-flag hostile persistent in-pursuit))
+  (go (method-of-object this flee))
   )
 
 (defmethod crimson-guard-method-214 ((this crimson-guard))
@@ -3584,6 +3614,76 @@
     )
   )
 
+;; Custom flee state for guards 
+(defstate flee (crimson-guard)
+  :virtual #t
+  :event (behavior ((proc process) (argc int) (message symbol) (block event-message-block))
+  (case message
+    (('hit 'hit-flinch 'hit-knocked)
+     ;; Handle hit normally but skip alert triggering
+     ((method-of-type nav-enemy general-event-handler) self proc argc message block)
+     )
+    (else
+      (enemy-event-handler proc argc message block)
+      )
+    )
+  )
+  :enter (behavior ()
+    (set! (-> self was-fleeing) #t)
+    (let ((t9-0 (-> (method-of-type nav-enemy flee) enter)))
+      (if t9-0 (t9-0))
+      )
+    (when (-> self nav)
+      (let ((v1-0 (-> self nav)))
+        (set! (-> v1-0 target-speed) (* (-> self speed-scale) (-> self enemy-info run-travel-speed)))
+        )
+      0
+      )
+    )
+  :trans (behavior ()
+  (when (and (logtest? (-> self draw status) (draw-control-status on-screen))
+             (< (vector-vector-distance (-> self root trans) (camera-pos)) 204800.0)
+             (time-elapsed? (-> self state-time) (seconds 8))
+             (zero? (rnd-int-count self 1200))  ;; ~1 in 1200 frames chance per frame
+             )
+    (let ((line (case (rnd-int-count self 4)
+                  ((0) "kg312a")
+                  ((1) "kg313a")
+                  ((2) "kg314a")
+                  (else "kg261a")
+                  )
+                )
+          )
+      (add-process *gui-control* self (gui-channel alert) (gui-action play) line -99.0 0)
+      )
+    )
+  )
+  :code (behavior ()
+    ;; Use the guard's run animation since they have no panic-run
+    (citizen-travel-anim (the-as int (-> self draw art-group data (-> self enemy-info run-anim))) 30)
+    )
+  :post (behavior ()
+    (when *target*
+      (let ((gp-0 (vector-! (new 'stack-no-clear 'vector)
+                             (-> self root trans)
+                             (-> *target* control trans)
+                             )
+                  )
+            )
+        (set! (-> gp-0 y) 0.0)
+        (vector-normalize! gp-0 409600.0)
+        (vector+! gp-0 gp-0 (-> self root trans))
+        (let ((v1-0 (-> self nav state)))
+          (logclear! (-> v1-0 flags) (nav-state-flag directional-mode))
+          (logior! (-> v1-0 flags) (nav-state-flag target-poly-dirty))
+          (set! (-> v1-0 target-post quad) (-> gp-0 quad))
+          )
+        )
+      )
+    (nav-enemy-method-176 self)
+    )
+  )
+
 (defmethod init-enemy-collision! ((this crimson-guard))
   "Initializes the [[collide-shape-moving]] and any ancillary tasks to make the enemy collide properly"
   (let ((s5-0 (new 'process 'collide-shape-moving this (collide-list-enum usually-hit-by-player))))
@@ -3789,6 +3889,7 @@
         (set! (-> this fact pickup-type) (pickup-type health))
         (set! (-> this fact pickup-amount) 2.0)
     )
+  (set! (-> this was-fleeing) #f) ;; Set was-fleeing field to false
   (set! (-> this traffic-target-status handle) (the-as handle #f))
   (let ((v1-24 (rnd-int-count this 2)))
     (cond

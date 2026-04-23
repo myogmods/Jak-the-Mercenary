@@ -1042,8 +1042,27 @@
   (set! (-> self data-int32 6) 1)
   ;; Lower alert level
   (send-event *traffic-manager* 'set-alert-level 0)
-  ;; Make Jak "invisible" to guards 
-    (when *target* (logclear! (-> *target* mask) (process-mask target)))
+  ;; Make all guards flee if Jak is still alive
+  (when (and *target* (not (focus-test? *target* dead)))
+    (when *traffic-manager*
+      (let ((engine (-> *traffic-manager* traffic-engine)))
+        (dotimes (i (the-as int (-> engine citizen-tracker-array active-object-count)))
+          (let ((proc (handle->process (-> engine citizen-tracker-array active-object-list i))))
+            (when (and proc (type? proc crimson-guard))
+              (send-event proc 'go-flee)
+              )
+            )
+          )
+        (dotimes (i (the-as int (-> engine vehicle-tracker-array active-object-count)))
+          (let ((proc (handle->process (-> engine vehicle-tracker-array active-object-list i))))
+            (when (and proc (type? proc crimson-guard))
+              (send-event proc 'go-flee)
+              )
+            )
+          )
+        )
+      )
+  )
   ;; Compute rank
   (let* ((kills       (the int (-> *game-info* score)))
          (hi-score    (the int (-> (get-game-score-ref *game-info* (the-as int (game-score merc-genc))) 0)))
