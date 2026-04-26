@@ -12359,7 +12359,7 @@
               (new 'static 'game-task-event
                 :actor (game-task-actor minimap)
                 :action (game-task-action show)
-                :tex (game-task-icon gaticon-52)
+                :tex (game-task-icon gaticon-71)
                 :scene #f
                 )
               )
@@ -12486,7 +12486,7 @@
               (new 'static 'game-task-event
                 :actor (game-task-actor minimap)
                 :action (game-task-action show)
-                :tex (game-task-icon gaticon-52)
+                :tex (game-task-icon gaticon-72)
                 :scene #f
                 )
               )
@@ -12613,7 +12613,7 @@
               (new 'static 'game-task-event
                 :actor (game-task-actor minimap)
                 :action (game-task-action show)
-                :tex (game-task-icon gaticon-52)
+                :tex (game-task-icon gaticon-73)
                 :scene #f
                 )
               )

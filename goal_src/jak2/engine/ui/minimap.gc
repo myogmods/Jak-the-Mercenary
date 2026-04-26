@@ -263,7 +263,7 @@
     )
   )
 
-(define *minimap-class-list* (new 'static 'inline-array minimap-class-node 71
+(define *minimap-class-list* (new 'static 'inline-array minimap-class-node 74 ;; <- increased array size from 71
                                (new 'static 'minimap-class-node
                                  :default-position (new 'static 'vector :w 1.0)
                                  :flags (minimap-flag trail bigmap)
@@ -724,15 +724,15 @@
                                (new 'static 'minimap-class-node
                                  :default-position (new 'static 'vector :x 2985451.5 :y 34406.4 :z 2185216.0 :w 1.0)
                                  :flags (minimap-flag bigmap city-only)
-                                 :name "bbush-markb"
+                                 :name "bbush-markb" ;; ;; city-burning-bush-get-to-7 / burning-bush-markb
                                  :icon-xy (new 'static 'vector2ub :data (new 'static 'array uint8 2 #x2 #x3))
                                  :scale 1.0
                                  :color (new 'static 'rgba :r #xff :g #xff :b #xff :a #x80)
                                  )
                                (new 'static 'minimap-class-node
-                                 :default-position (new 'static 'vector :x 2576916.5 :y 34406.4 :z 3131310.0 :w 1.0)
+                                 :default-position (new 'static 'vector :x 2985451.5 :y 34406.4 :z 2185216.0 :w 1.0)
                                  :flags (minimap-flag bigmap city-only)
-                                 :name "bbush-markb-2"
+                                 :name "bbush-markb-2" ;; city-burning-bush-get-to-6 / burning-bush-markb
                                  :icon-xy (new 'static 'vector2ub :data (new 'static 'array uint8 2 #x2 #x3))
                                  :scale 1.0
                                  :color (new 'static 'rgba :r #xff :g #xff :b #xff :a #x80)
@@ -824,6 +824,30 @@
                                  :scale 1.0
                                  :color (new 'static 'rgba :r #x7f :b #x7f :a #x80)
                                  )
+                                (new 'static 'minimap-class-node
+                                  :default-position (new 'static 'vector :x (meters 764.47) :y (meters 8.12) :z (meters -727.98) :w 1.0)
+                                  :flags (minimap-flag bigmap city-only)
+                                  :name "bbush-slumc-merc"
+                                  :icon-xy (new 'static 'vector2ub :data (new 'static 'array uint8 2 #x2 #x3))
+                                  :scale 1.0
+                                  :color (new 'static 'rgba :r #xff :g #xff :b #xff :a #x80)
+                                  )
+                                (new 'static 'minimap-class-node
+                                  :default-position (new 'static 'vector :x (meters 75.44) :y (meters 7.99) :z (meters 329.87) :w 1.0)
+                                  :flags (minimap-flag bigmap city-only)
+                                  :name "bbush-genc-merc"
+                                  :icon-xy (new 'static 'vector2ub :data (new 'static 'array uint8 2 #x2 #x3))
+                                  :scale 1.0
+                                  :color (new 'static 'rgba :r #xff :g #xff :b #xff :a #x80)
+                                  )
+                                (new 'static 'minimap-class-node
+                                  :default-position (new 'static 'vector :x (meters 416.67) :y (meters 8.40) :z (meters 422.77) :w 1.0)
+                                  :flags (minimap-flag bigmap city-only)
+                                  :name "bbush-markb-merc"
+                                  :icon-xy (new 'static 'vector2ub :data (new 'static 'array uint8 2 #x2 #x3))
+                                  :scale 1.0
+                                  :color (new 'static 'rgba :r #xff :g #xff :b #xff :a #x80)
+                                  )
                                )
         )
 

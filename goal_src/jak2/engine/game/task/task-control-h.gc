@@ -179,6 +179,11 @@
   (gaticon-67)
   (gaticon-68)
   (gaticon-69)
+  ;; custom entries
+  (gaticon-70) ;; metalhead (dummy entry)
+  (gaticon-71) ;; merc-genc
+  (gaticon-72) ;; merc-markb
+  (gaticon-73) ;; merc-markb
   )
 
 (defenum task-manager-mask
