@@ -34,6 +34,126 @@
       (none)
     )
 
+    (define *merc-slumc-arrow-done* #f)
+    (define *merc-genc-arrow-done* #f)
+    (define *merc-markb-arrow-done* #f)
+    (define *merc-arrows-spawned* #f)
+    ;; Call every frame from runs-every-frame
+    (defun merc-spawn-start-arrow ()
+      (cond
+        ((= (level-status *level* 'ctywide) 'active)
+        (when (not *merc-arrows-spawned*)
+          (when (and (not *merc-slumc-arrow-done*) (task-node-closed? (game-task-node city-protect-water-slums-resolution)))
+            (add-icon! *minimap* *dproc* (the-as uint 15) 12345 (new 'static 'vector :x (meters 766.16) :y (meters 8.41) :z (meters -723.03) :w 1.0) 0)
+            (process-spawn-function process-drawable
+              (lambda :behavior process-drawable ()
+                (set! (-> self part) (create-launch-control group-rod-of-god self))
+                (loop
+                  (set! (-> *part-id-table* 267 init-specs 4 initial-valuef) 24576.0)
+                  (set! (-> *part-id-table* 270 init-specs 3 initial-valuef) 65536.0)
+                  (set! (-> *part-id-table* 268 init-specs 9 initial-valuef) 20.0)
+                  (spawn (-> self part) (new 'static 'vector :x (meters 766.16) :y (meters 8.41) :z (meters -723.03) :w 1.0))
+                  (suspend)
+                  )
+                )
+              :to *entity-pool*
+              :name "merc-slumc-rod-of-god"
+              )
+            )
+          (when (and (not *merc-genc-arrow-done*) (task-node-closed? (game-task-node atoll-battle-resolution)))
+            (add-icon! *minimap* *dproc* (the-as uint 15) 12346 (new 'static 'vector :x (meters 75.44) :y (meters 7.99) :z (meters 329.87) :w 1.0) 0)
+            (process-spawn-function process-drawable
+              (lambda :behavior process-drawable ()
+                (set! (-> self part) (create-launch-control group-rod-of-god self))
+                (loop
+                  (set! (-> *part-id-table* 267 init-specs 4 initial-valuef) 24576.0)
+                  (set! (-> *part-id-table* 270 init-specs 3 initial-valuef) 65536.0)
+                  (set! (-> *part-id-table* 268 init-specs 9 initial-valuef) 20.0)
+                  (spawn (-> self part) (new 'static 'vector :x (meters 75.44) :y (meters 7.99) :z (meters 329.87) :w 1.0))
+                  (suspend)
+                  )
+                )
+              :to *entity-pool*
+              :name "merc-genc-rod-of-god"
+              )
+            )
+          (when (and (not *merc-markb-arrow-done*) (task-node-closed? (game-task-node city-intercept-tanker-resolution)))
+            (add-icon! *minimap* *dproc* (the-as uint 15) 12347 (new 'static 'vector :x (meters 416.67) :y (meters 8.40) :z (meters 422.77) :w 1.0) 0)
+            (process-spawn-function process-drawable
+              (lambda :behavior process-drawable ()
+                (set! (-> self part) (create-launch-control group-rod-of-god self))
+                (loop
+                  (set! (-> *part-id-table* 267 init-specs 4 initial-valuef) 24576.0)
+                  (set! (-> *part-id-table* 270 init-specs 3 initial-valuef) 65536.0)
+                  (set! (-> *part-id-table* 268 init-specs 9 initial-valuef) 20.0)
+                  (spawn (-> self part) (new 'static 'vector :x (meters 416.67) :y (meters 8.40) :z (meters 422.77) :w 1.0))
+                  (suspend)
+                  )
+                )
+              :to *entity-pool*
+              :name "merc-markb-rod-of-god"
+              )
+            )
+          (set! *merc-arrows-spawned* #t)
+          )
+        )
+        ;; ctywide not active — kill all active icons and beams 
+        (else
+          (kill-by-key (-> *minimap* engine) 12345)
+          (kill-by-key (-> *minimap* engine) 12346)
+          (kill-by-key (-> *minimap* engine) 12347)
+          (let ((beam-proc (process-by-name "merc-slumc-rod-of-god" *active-pool*)))
+            (when beam-proc (deactivate beam-proc))
+            )
+          (let ((beam-proc (process-by-name "merc-genc-rod-of-god" *active-pool*)))
+            (when beam-proc (deactivate beam-proc))
+            )
+          (let ((beam-proc (process-by-name "merc-markb-rod-of-god" *active-pool*)))
+            (when beam-proc (deactivate beam-proc))
+            )
+          (set! *merc-arrows-spawned* #f)
+          )
+        )
+      (none)
+      )
+
+    ;; Call every frame from runs-every-frame
+    (defun merc-update-start-arrow ()
+      (when *target*
+        (when (and (in-bubble? (meters 766.16) (meters 8.41) (meters -723.03) (meters 50.0))
+                  (task-node-closed? (game-task-node city-protect-water-slums-resolution))
+                  (= (level-status *level* 'ctyslumc) 'active)
+                )
+          (kill-by-key (-> *minimap* engine) 12345)
+          (set! *merc-slumc-arrow-done* #t)
+          (let ((beam-proc (process-by-name "merc-slumc-rod-of-god" *active-pool*)))
+            (when beam-proc (deactivate beam-proc))
+            )
+          )
+        (when (and (in-bubble? (meters 75.44) (meters 7.99) (meters 329.87) (meters 50.0))
+                  (task-node-closed? (game-task-node atoll-battle-resolution))
+                  (= (level-status *level* 'ctygenc) 'active)
+                )
+          (kill-by-key (-> *minimap* engine) 12346)
+          (set! *merc-genc-arrow-done* #t)
+          (let ((beam-proc (process-by-name "merc-genc-rod-of-god" *active-pool*)))
+            (when beam-proc (deactivate beam-proc))
+            )
+          )
+        (when (and (in-bubble? (meters 416.67) (meters 8.40) (meters 422.77) (meters 50.0))
+                  (task-node-closed? (game-task-node city-intercept-tanker-resolution))
+                  (= (level-status *level* 'ctymarkb) 'active)
+                )
+          (kill-by-key (-> *minimap* engine) 12347)
+          (set! *merc-markb-arrow-done* #t)
+          (let ((beam-proc (process-by-name "merc-markb-rod-of-god" *active-pool*)))
+            (when beam-proc (deactivate beam-proc))
+            )
+          )
+        )
+      (none)
+      )
+
     (defun runs-every-frame ()
       ;; (increase-power-cell-by-one) This is a call to increase-power-cell-by-one defined in mod-common-functions.gc
 
@@ -58,7 +178,10 @@
       (when *debug-segment*
         (orb-placer-maintenance)
         )
-      
+
+      (merc-spawn-start-arrow)
+      (merc-update-start-arrow)
+
       (none)
       )
 
@@ -110,7 +233,6 @@
     (defun runs-on-jak-spawn ()
       ;; Code here runs every time jak spawns (loading a file new game or death)   
       (wider-view)
-
       (none)
       )
 
