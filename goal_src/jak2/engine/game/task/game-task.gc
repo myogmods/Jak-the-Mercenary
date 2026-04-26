@@ -10733,7 +10733,7 @@
             :flags (game-task-node-flag save-on-try)
             :parent-node (new 'static 'array game-task-node 4
               (game-task-node drill-ship-resolution)
-              (game-task-node none)
+              (game-task-node city-burning-bush-get-to-6-resolution)
               (game-task-node none)
               (game-task-node none)
               )
@@ -12500,7 +12500,7 @@
             :on-open #f
             :info #f
             :borrow '()
-            :open? (lambda ((arg0 game-task-node-info)) (!= *kernel-boot-message* 'preview))
+            :open? #f
             :on-close #f
             )
           (new 'static 'game-task-node-info
@@ -12619,7 +12619,7 @@
               )
             :flags (game-task-node-flag save-on-try)
             :parent-node (new 'static 'array game-task-node 4
-              (game-task-node atoll-battle-resolution)
+              (game-task-node city-intercept-tanker-resolution)
               (game-task-node none)
               (game-task-node none)
               (game-task-node none)

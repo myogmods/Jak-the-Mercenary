@@ -123,7 +123,26 @@
         "name": "clock-green-30s-6"
       }
     },
-
+    {
+      "trans": [242.34,  12.17, 124.50],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [-0.00,  -0.60,   0.00,   0.79],
+      "bsphere": [242.34,  12.17, 124.50, 10],
+      "lump": {
+        "name": "clock-green-30s-7"
+      }
+    },
+    {
+      "trans": [141.59,  12.17, 124.50],
+      "etype": "clock-green-30s",
+      "game_task": 0,
+      "quat" : [-0.00,  -0.72,  -0.00,   0.69],
+      "bsphere": [141.59,  12.17, 124.50, 10],
+      "lump": {
+        "name": "clock-green-30s-8"
+      }
+    },
     {
       "trans": [191.83,  15.61, 200.371],
       "etype": "clock-blue-50s",
@@ -134,27 +153,6 @@
         "name": "clock-blue-50s-4"
       }
     },
-    {
-      "trans": [242.34,  12.17, 124.50],
-      "etype": "clock-blue-50s",
-      "game_task": 0,
-      "quat" : [-0.00,  -0.60,   0.00,   0.79],
-      "bsphere": [242.34,  12.17, 124.50, 10],
-      "lump": {
-        "name": "clock-blue-50s-5"
-      }
-    },
-    {
-      "trans": [141.59,  12.17, 124.50],
-      "etype": "clock-blue-50s",
-      "game_task": 0,
-      "quat" : [-0.00,  -0.72,  -0.00,   0.69],
-      "bsphere": [141.59,  12.17, 124.50, 10],
-      "lump": {
-        "name": "clock-blue-50s-6"
-      }
-    },
-
     {
       "trans": [192.14,  16.48, 381.871],
       "etype": "clock-gold-90s",
