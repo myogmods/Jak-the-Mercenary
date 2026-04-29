@@ -1517,6 +1517,7 @@
     (logclear! (-> *game-info* secrets) (game-secrets invulnerable))
     (logclear! (-> *game-info* secrets) (game-secrets endless-dark))
     (logclear! (-> *game-info* secrets) (game-secrets endless-ammo))
+    ;; (lock-cheat! turbo-board) turned off inside of pckernel.gc instead
     (local-vars (s5-4 object))
     ;; Once weather has fully transitioned to heavy rain, lock it with override
     (when (and (not (-> *mood-control* overide-weather-flag))
