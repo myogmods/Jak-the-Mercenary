@@ -1376,10 +1376,11 @@
     ;; modified to increment mercenary game kill counter when guard fall in water.
     ;; they don't "die" when falling in water, just moved to inactive state and despawned, so this mod is necessary.
     (when (and *merc-tracking-active*
-               (logtest? (-> self focus-status) (focus-status touch-water))
-               )
+              (logtest? (-> self focus-status) (focus-status touch-water))
+              )
       (+! *merc-kill-count* 1)
-      (set! (-> *game-info* score) (the float *merc-kill-count*))
+      (+! *merc-points* (* 300 *merc-combo-level*))
+      (set! (-> *game-info* score) (the float *merc-points*))
       )
       
     (when (-> self minimap)
