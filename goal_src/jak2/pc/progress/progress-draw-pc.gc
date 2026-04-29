@@ -95,7 +95,8 @@
         ((and (>= highscore-index 0) (<= highscore-index 4)) (set! highscore-type 'game))
         ((and (>= highscore-index 5) (<= highscore-index 12)) (set! highscore-type 'race))
         ((= highscore-index 13) (set! highscore-type 'game))
-        ((and (>= highscore-index 15) (<= highscore-index 20)) (set! highscore-type 'speedrun))))
+        ((and (>= highscore-index 15) (<= highscore-index 18)) (set! highscore-type 'game))
+        ((and (>= highscore-index 19) (<= highscore-index 24)) (set! highscore-type 'speedrun))))
     highscore-type))
 
 (defun print-highscore-pc ((highscore-row print-highscore-obj) (name string))
@@ -185,7 +186,11 @@
         ((= index 12) (set! available? (logtest? (-> *game-info* secrets) (game-secrets reverse-races))))
         ((= index 13) (set! available? (logtest? (-> *game-info* sub-task-list (game-task-node city-play-onin-game-introduction) flags) (game-task-node-flag closed))))
         ((= index 14) (set! available? (logtest? (-> *game-info* sub-task-list (game-task-node city-whack-introduction) flags) (game-task-node-flag closed))))
-        ((and (>= index 15) (<= index 20)) (set! available? (and (-> *pc-settings* speedrunner-mode?))))))
+        ((= index 15) (set! available? (logtest? (-> *game-info* sub-task-list (game-task-node city-protect-water-slums-resolution) flags) (game-task-node-flag closed))))
+        ((= index 16) (set! available? (logtest? (-> *game-info* sub-task-list (game-task-node atoll-battle-resolution) flags) (game-task-node-flag closed))))
+        ((= index 17) (set! available? (logtest? (-> *game-info* sub-task-list (game-task-node city-intercept-tanker-resolution) flags) (game-task-node-flag closed))))
+        ((= index 18) (set! available? (logtest? (-> *game-info* sub-task-list (game-task-node forest-burning-bush-forest-mercenary-introduction) flags) (game-task-node-flag closed)))) ;; adjust this if mercforest is ever implemented
+        ((and (>= index 19) (<= index 24)) (set! available? (and (-> *pc-settings* speedrunner-mode?))))))
     available?))
 
 (defun get-highscore-text ((highscore-index int))
@@ -197,7 +202,11 @@
         ((and (>= index 5) (<= index 12)) (set! id (text-id progress-highscores-header-race)))
         ((= index 13) (set! id (text-id progress-highscores-header-onin)))
         ((= index 14) (set! id (text-id progress-highscores-header-metalhead-mash)))
-        ((and (>= index 15) (<= index 20)) (set! id (text-id progress-highscores-header-speedrun)))))
+        ((= index 15) (set! id (text-id progress-highscores-jak-the-mercenary)))
+        ((= index 16) (set! id (text-id progress-highscores-jak-the-mercenary)))
+        ((= index 17) (set! id (text-id progress-highscores-jak-the-mercenary)))
+        ((= index 18) (set! id (text-id progress-highscores-jak-the-mercenary)))
+        ((and (>= index 19) (<= index 24)) (set! id (text-id progress-highscores-header-speedrun)))))
     (the-as text-id id)))
 
 (defun get-highscore-text-sub ((highscore-index int))
@@ -219,39 +228,46 @@
         ((= index 12) (set! id (text-id progress-highscores-subheader-class1-reverse)))
         ((= index 13) (set! id (text-id progress-highscores-subheader-oninstent)))
         ((= index 14) (set! id (text-id progress-highscores-subheader-hiphog)))
-        ((= index 15) (set! id (text-id progress-highscores-subheader-speedrun-any)))
-        ((= index 16) (set! id (text-id progress-highscores-subheader-speedrun-anyhoverless)))
-        ((= index 17) (set! id (text-id progress-highscores-subheader-speedrun-allmissions)))
-        ((= index 18) (set! id (text-id progress-highscores-subheader-speedrun-100)))
-        ((= index 19) (set! id (text-id progress-highscores-subheader-speedrun-anyorbs)))
-        ((= index 20) (set! id (text-id progress-highscores-subheader-speedrun-anyhero)))))
+        ((= index 15) (set! id (text-id progress-highscores-water-slums)))
+        ((= index 16) (set! id (text-id progress-highscores-central-plaza)))
+        ((= index 17) (set! id (text-id progress-highscores-bazaar)))
+        ((= index 18) (set! id (text-id progress-highscores-forest)))
+        ((= index 19) (set! id (text-id progress-highscores-subheader-speedrun-any)))
+        ((= index 20) (set! id (text-id progress-highscores-subheader-speedrun-anyhoverless)))
+        ((= index 21) (set! id (text-id progress-highscores-subheader-speedrun-allmissions)))
+        ((= index 22) (set! id (text-id progress-highscores-subheader-speedrun-100)))
+        ((= index 23) (set! id (text-id progress-highscores-subheader-speedrun-anyorbs)))
+        ((= index 24) (set! id (text-id progress-highscores-subheader-speedrun-anyhero)))))
     (the-as text-id id)))
 
 (defun get-highscore-icon ((highscore-index int))
   (let ((texture (new 'static 'texture-id :index #x10 :page #xc93)))
     (let ((index highscore-index))
       (cond
-        ((zero? index) (set! texture (new 'static 'texture-id :index #x10 :page #xc93)))
-        ((= index 1) (set! texture (new 'static 'texture-id :index #x12 :page #xc93)))
-        ((= index 2) (set! texture (new 'static 'texture-id :index #x13 :page #xc93)))
-        ((= index 3) (set! texture (new 'static 'texture-id :index #x11 :page #xc93)))
-        ((= index 4) (set! texture (new 'static 'texture-id :index #xe :page #xc93)))
-        ((and (>= index 5) (<= index 12)) (set! texture (new 'static 'texture-id :index #x1 :page #xc93)))
-        ((= index 13) (set! texture (new 'static 'texture-id :index #x16 :page #xc93)))
-        ((= index 14) (set! texture (new 'static 'texture-id :index #x17 :page #xc93)))
-        ;; TODO - maybe i can lookup some unique icons for the categories? Maybe some of the bigmap ones? for now just the jetboard because fast
-        ((and (>= index 15) (<= index 20)) (set! texture (new 'static 'texture-id :index #xe :page #xc93)))))
+        ((zero? index) (set! texture (new 'static 'texture-id :index #x10 :page #xc93))) ;; hud-gunicon-01
+        ((= index 1) (set! texture (new 'static 'texture-id :index #x12 :page #xc93))) ;; hud-gunicon-03
+        ((= index 2) (set! texture (new 'static 'texture-id :index #x13 :page #xc93))) ;; hud-gunicon-04
+        ((= index 3) (set! texture (new 'static 'texture-id :index #x11 :page #xc93))) ;; hud-gunicon-02
+        ((= index 4) (set! texture (new 'static 'texture-id :index #xe :page #xc93))) ;; hud-hoverboard-icon
+        ((and (>= index 5) (<= index 12)) (set! texture (new 'static 'texture-id :index #x1 :page #xc93))) ;; hud-bikeicon
+        ((= index 13) (set! texture (new 'static 'texture-id :index #x16 :page #xc93))) ;; hud-oningame-icon
+        ((= index 14) (set! texture (new 'static 'texture-id :index #x17 :page #xc93))) ;; hud-whack-icon
+        ((= index 15) (set! texture (new 'static 'texture-id :index #x4b :page #xc93))) ;; texture replaced progress-minimap/default-jak-04.png
+        ((= index 16) (set! texture (new 'static 'texture-id :index #x4b :page #xc93))) ;; texture replaced progress-minimap/default-jak-04.png 
+        ((= index 17) (set! texture (new 'static 'texture-id :index #x4b :page #xc93))) ;; texture replaced progress-minimap/default-jak-04.png 
+        ((= index 18) (set! texture (new 'static 'texture-id :index #x4b :page #xc93))) ;; texture replaced progress-minimap/default-jak-04.png 
+        ((and (>= index 19) (<= index 24)) (set! texture (new 'static 'texture-id :index #xe :page #xc93))))) ;; hud-hoverboard-icon
     (the-as texture-id texture)))
 
 (defun get-num-highscores ()
   (let ((count 0))
-    (dotimes (max-highscores (if (-> *pc-settings* speedrunner-mode?) 21 15))
+    (dotimes (max-highscores (if (-> *pc-settings* speedrunner-mode?) 25 19))
       (when (highscore-available? max-highscores)
         (+! count 1)))
     count))
 
 (defun get-next-highscore ((current-highscore-index int))
-  (let ((max-highscores (if (-> *pc-settings* speedrunner-mode?) 21 15))
+  (let ((max-highscores (if (-> *pc-settings* speedrunner-mode?) 25 19))
         (index-change 1)
         (selected-index -1))
     (+ current-highscore-index index-change)
@@ -265,7 +281,7 @@
     selected-index))
 
 (defun get-prev-highscore ((current-highscore-index int))
-  (let ((max-highscores (if (-> *pc-settings* speedrunner-mode?) 21 15))
+  (let ((max-highscores (if (-> *pc-settings* speedrunner-mode?) 25 19))
         (index-change 1)
         (selected-index -1))
     (+ current-highscore-index index-change)
@@ -292,7 +308,8 @@
       ((and (>= highscore-index 5) (<= highscore-index 12)) (set! scale race-scale))
       ((= highscore-index 13) (set! scale 0.7))
       ((= highscore-index 14) (set! scale 0.7))
-      ((and (>= highscore-index 15) (<= highscore-index 20)) (set! scale 0.5)))
+      ((and (>= highscore-index 15) (<= highscore-index 18)) (set! scale 2.3))
+      ((and (>= highscore-index 19) (<= highscore-index 24)) (set! scale 0.5)))
     scale))
 
 (defun get-highscore-icon-xoffset ((highscore-index int))
@@ -322,12 +339,16 @@
     ((12) (pc-get-external-race-time "class1rev" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
     ((13) (pc-get-external-highscore "onin" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
     ((14) (pc-get-external-highscore "mash" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
-    ((15) (pc-get-external-speedrun-time "any" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
-    ((16) (pc-get-external-speedrun-time "anyhoverless" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
-    ((17) (pc-get-external-speedrun-time "allmissions" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
-    ((18) (pc-get-external-speedrun-time "100" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
-    ((19) (pc-get-external-speedrun-time "anyorbs" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
-    ((20) (pc-get-external-speedrun-time "anyhero" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))))
+    ((15) (none))
+    ((16) (none))
+    ((17) (none))
+    ((18) (none))
+    ((19) (pc-get-external-speedrun-time "any" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
+    ((20) (pc-get-external-speedrun-time "anyhoverless" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
+    ((21) (pc-get-external-speedrun-time "allmissions" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
+    ((22) (pc-get-external-speedrun-time "100" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
+    ((23) (pc-get-external-speedrun-time "anyorbs" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))
+    ((24) (pc-get-external-speedrun-time "anyhero" row-index *pc-cpp-temp-string* (&-> *progress-pc-generic-store* custom-highscore-score)))))
 
 (defun draw-highscore-page-up-down-arrows ((font-ctx font-context) (draw-up? symbol) (draw-down? symbol))
   (let ((new-x-pos 58.0)

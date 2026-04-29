@@ -854,6 +854,12 @@
   (pad-x #x2002)
   (pad-square #x2003)
 
+  (progress-highscores-jak-the-mercenary #x3000)
+  (progress-highscores-water-slums #x3001)
+  (progress-highscores-central-plaza #x3002)
+  (progress-highscores-bazaar #x3003)
+  (progress-highscores-forest #x3004)
+
   ;; destination names text
   (caspad-name #x10000)
   (nest-name #x10001)
