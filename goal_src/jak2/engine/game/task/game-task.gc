@@ -12344,7 +12344,25 @@
                     )
             :on-close #f
             )
-          ;; custom entries 
+          ;; custom entries
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-slumc-mercenary)
+            :name "city-burning-bush-slumc-mercenary-discover"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node city-protect-water-slums-resolution)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
+            :on-close #f
+            ) 
           (new 'static 'game-task-node-info
             :level 'city
             :task (game-task city-burning-bush-slumc-mercenary)
@@ -12475,6 +12493,24 @@
           (new 'static 'game-task-node-info
             :level 'city
             :task (game-task city-burning-bush-genc-mercenary)
+            :name "city-burning-bush-genc-mercenary-discover"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node atoll-battle-resolution)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-genc-mercenary)
             :name "city-burning-bush-genc-mercenary-introduction"
             :when-open (new 'static 'boxed-array :type game-task-event
               (new 'static 'game-task-event
@@ -12596,6 +12632,24 @@
               :on-fail #f
               )
             :borrow '((ctywide 0 merc-genc display))
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
+            :task (game-task city-burning-bush-markb-mercenary)
+            :name "city-burning-bush-markb-mercenary-discover"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node city-intercept-tanker-resolution)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
             :open? #f
             :on-close #f
             )
@@ -12801,7 +12855,7 @@
             )
           )
         )
-  (set! (-> gp-0 mission-list) (new 'global 'boxed-array game-task-node-info 341)) ;; Increased from 324
+  (set! (-> gp-0 mission-list) (new 'global 'boxed-array game-task-node-info 344)) ;; Increased from 324
   (dotimes (v1-3 (-> gp-0 sub-task-list length))
     (if (-> gp-0 sub-task-list v1-3 info)
         (set! (-> gp-0 sub-task-list v1-3 info manager) (the-as handle #f))
