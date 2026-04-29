@@ -979,7 +979,7 @@
                       ((= (level-status *level* 'ctyslumc) 'active)  "(Water Slums)")
                       ((= (level-status *level* 'ctygenc) 'active)   "(Central Plaza)")
                       ((= (level-status *level* 'ctymarkb) 'active)  "(Bazaar)")
-                      ((= (level-status *level* 'stadium) 'active)   "(Forest)")
+                      ((= (level-status *level* 'forest) 'active)    "(Forest)")
                       )
                     )
            )
