@@ -1573,13 +1573,65 @@
       (play-sound-file "get-point.wav" (the int (* (-> *setting-control* user-current sfx-volume) 30.0)))
       (set! *merc-prev-score* *merc-kill-count*)
       )
-    ;; Update hud-goal with highscore
-    (let ((hi-ref (get-game-score-ref *game-info* (the-as int (game-score merc-markb)))))
-      (if (>= (-> *game-info* score) (-> hi-ref 0))
-          (set! (-> *game-info* goal) (-> *game-info* score))
-          (set! (-> *game-info* goal) (-> hi-ref 0))
+    ;; Update hud-goal with medal targets
+    (let* ((hi-ref (get-game-score-ref *game-info* (the-as int (game-score merc-markb))))
+          (bronze-target (-> *highscore-info-array* 19 award-scores 0))
+          (silver-target (-> *highscore-info-array* 19 award-scores 1))
+          (gold-target   (-> *highscore-info-array* 19 award-scores 2))
+          (hud-goal-proc (handle->process (-> self slave 31)))
+          ;; Find real high score by ignoring default threshold values
+          (real-high-score (let ((best 0.0))
+                            (dotimes (i 8)
+                              (let ((s (-> hi-ref i)))
+                                (when (and (> s best)
+                                            (!= s bronze-target)
+                                            (!= s silver-target)
+                                            (!= s gold-target)
+                                            )
+                                  (set! best s)
+                                  )
+                                )
+                              )
+                            best
+                            )
+                          )
+          (best-score (fmax (-> *game-info* score) real-high-score))
           )
+    (cond
+      ;; Best score beats gold — show highscore with "Goal" label
+      ((>= best-score gold-target)
+      (set! (-> *game-info* goal) best-score)
+      (when hud-goal-proc
+        (format (clear (-> (the-as hud-goal hud-goal-proc) strings 1 text)) "~S"
+          (lookup-text! *common-text* (text-id highscore-text-goal) #f))
+        )
       )
+      ;; Best score beats silver — show gold target
+      ((>= best-score silver-target)
+      (set! (-> *game-info* goal) gold-target)
+      (when hud-goal-proc
+        (format (clear (-> (the-as hud-goal hud-goal-proc) strings 1 text)) "~S"
+          (lookup-text! *common-text* (text-id highscore-text-gold) #f))
+        )
+      )
+      ;; Best score beats bronze — show silver target
+      ((>= best-score bronze-target)
+      (set! (-> *game-info* goal) silver-target)
+      (when hud-goal-proc
+        (format (clear (-> (the-as hud-goal hud-goal-proc) strings 1 text)) "~S"
+          (lookup-text! *common-text* (text-id highscore-text-silver) #f))
+        )
+      )
+      ;; Below bronze — show bronze target
+      (else
+      (set! (-> *game-info* goal) bronze-target)
+      (when hud-goal-proc
+        (format (clear (-> (the-as hud-goal hud-goal-proc) strings 1 text)) "~S"
+          (lookup-text! *common-text* (text-id highscore-text-bronze) #f))
+        )
+        )
+      )
+    )
     ;; Only run transport spawning/completion when not in results screen
     (when (zero? (-> self data-int32 6))
       ;; Vanilla code to spawn transports etc

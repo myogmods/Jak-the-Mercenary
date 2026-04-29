@@ -1884,9 +1884,9 @@
       :flags (highscore-flags time)
       :award-scores (new 'static 'array float 3 178.0 173.0 168.0)
       )
-    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 400000.0 600000.0 800000.0)) ;; added
-    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 400000.0 600000.0 800000.0)) ;; added
-    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 400000.0 600000.0 800000.0)) ;; added
-    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 300000.0 500000.0 700000.0)) ;; added
+    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 400000.0 600000.0 800000.0)) ;; merc-slumc
+    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 400000.0 600000.0 800000.0)) ;; merc-genc
+    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 400000.0 600000.0 800000.0)) ;; merc-markb
+    (new 'static 'highscore-info :award-scores (new 'static 'array float 3 300000.0 500000.0 700000.0)) ;; mercforest
     )
   )
