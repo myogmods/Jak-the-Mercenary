@@ -1037,6 +1037,15 @@
             )
           ;; custom entries 
           (new 'static 'game-task-info
+            :name "mods-hints"
+            ;; :pre-play-node #f
+            ;; :kiosk-play-node #f
+            ;; :pre-play-continue #f
+            ;; :play-node #f
+            ;; :play-continue #f
+            ;; :kiosk-play-continue #f
+            )
+          (new 'static 'game-task-info
             :name "city-burning-bush-slumc-mercenary"
             :pre-play-node (game-task-node city-burning-bush-slumc-mercenary-introduction)
             :kiosk-play-node (game-task-node city-burning-bush-slumc-mercenary-resolution)
@@ -12347,6 +12356,24 @@
           ;; custom entries
           (new 'static 'game-task-node-info
             :level 'city
+            :task (game-task mods-hints)
+            :name "hover-cam-hint-done"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
+            :level 'city
             :task (game-task city-burning-bush-slumc-mercenary)
             :name "city-burning-bush-slumc-mercenary-discover"
             :when-open #f
@@ -12855,14 +12882,14 @@
             )
           )
         )
-  (set! (-> gp-0 mission-list) (new 'global 'boxed-array game-task-node-info 344)) ;; Increased from 324
+  (set! (-> gp-0 mission-list) (new 'global 'boxed-array game-task-node-info 345)) ;; Increased from 324
   (dotimes (v1-3 (-> gp-0 sub-task-list length))
     (if (-> gp-0 sub-task-list v1-3 info)
         (set! (-> gp-0 sub-task-list v1-3 info manager) (the-as handle #f))
         )
     )
   (when (zero? (-> gp-0 task-perm-list))
-    (let ((v1-8 (new 'global 'entity-perm-array 114))) ;; increased from 110
+    (let ((v1-8 (new 'global 'entity-perm-array 115))) ;; increased from 110
       (set! (-> gp-0 task-perm-list) v1-8)
       (dotimes (a0-16 (-> v1-8 length))
         (set! (-> v1-8 data a0-16 task) (the-as game-task a0-16))
