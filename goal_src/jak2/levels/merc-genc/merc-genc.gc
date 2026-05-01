@@ -1152,6 +1152,7 @@
          )
         )
       )
+    (auto-save-user)
     (until (or (cpad-pressed? 0 confirm) (cpad-pressed? 0 triangle))
            (process-grab? *target* #f) ;; Remove control of Jak
            (with-dma-buffer-add-bucket ((buf (-> (current-frame) global-buf))
