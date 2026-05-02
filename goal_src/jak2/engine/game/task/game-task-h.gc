@@ -458,6 +458,7 @@
   (stadium-burning-bush-race-class1-r-introduction)
   (stadium-burning-bush-race-class1-r-resolution)
   ;; custom entries
+  (begin-game-mod-explanation-hint-done)
   (hover-cam-hint-done)
   (city-burning-bush-slumc-mercenary-discover)
   (city-burning-bush-slumc-mercenary-introduction)

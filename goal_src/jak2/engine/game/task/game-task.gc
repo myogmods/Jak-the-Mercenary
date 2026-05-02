@@ -12355,6 +12355,24 @@
             )
           ;; custom entries
           (new 'static 'game-task-node-info
+            :level 'fortress
+            :task (game-task mods-hints)
+            :name "begin-game-mod-explanation-hint-done"
+            :when-open #f
+            :flags (game-task-node-flag save-on-life)
+            :parent-node (new 'static 'array game-task-node 4
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              (game-task-node none)
+              )
+            :on-open #f
+            :info #f
+            :borrow '()
+            :open? #f
+            :on-close #f
+            )
+          (new 'static 'game-task-node-info
             :level 'city
             :task (game-task mods-hints)
             :name "hover-cam-hint-done"
@@ -12882,7 +12900,7 @@
             )
           )
         )
-  (set! (-> gp-0 mission-list) (new 'global 'boxed-array game-task-node-info 345)) ;; Increased from 324
+  (set! (-> gp-0 mission-list) (new 'global 'boxed-array game-task-node-info 346)) ;; Increased from 324
   (dotimes (v1-3 (-> gp-0 sub-task-list length))
     (if (-> gp-0 sub-task-list v1-3 info)
         (set! (-> gp-0 sub-task-list v1-3 info manager) (the-as handle #f))

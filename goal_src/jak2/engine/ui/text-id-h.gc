@@ -853,6 +853,7 @@
   (pad-circle #x2001)
   (pad-x #x2002)
   (pad-square #x2003)
+  (pad-l1 #x2004)
 
   (progress-highscores-jak-the-mercenary #x3000)
   (progress-highscores-water-slums #x3001)
