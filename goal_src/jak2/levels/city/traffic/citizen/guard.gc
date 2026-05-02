@@ -1438,7 +1438,7 @@
                                                       0.6)) ;; Normal Jak
                     ((= attack-mode 'flop)     (if (and *target* (focus-test? *target* dark))
                                                       2.5   ;; Darkjak
-                                                      1.6)) ;; Normal Jak
+                                                      2.5)) ;; Normal Jak
                     ((= attack-mode 'darkjak)         0.75) ;; From darkjak invincibility
                     ((= attack-mode 'bomb)            2.5)  ;; Dark bomb 
                     ((= attack-mode 'ice)             2.5)  ;; Dark blast (idk why its called ice)
@@ -1447,7 +1447,7 @@
                     ((= attack-mode 'eco-blue)        0.8)
                     ((= attack-mode 'eco-dark)        2.5)
                     ((= attack-mode 'board)           1.0)
-                    ((= attack-mode 'board-spin)      2.5)
+                    ((= attack-mode 'board-spin)      5.0)
                     (else                             1.0)
                     )
                   )
