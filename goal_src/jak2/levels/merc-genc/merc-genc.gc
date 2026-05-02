@@ -665,75 +665,6 @@
     )
   )
 
-(defbehavior security-wall-init-by-other security-wall ((pt0 vector) (pt1 vector) (height float))
-  (set! (-> self breach) #f)
-  (set! (-> self pass) 0)  ;; pass 0 never matches any pass-feature check — wall stays permanently closed
-  (set! (-> self touch-count) 0)
-  (set! (-> self flash) 0.0)
-  (set! (-> self message) 0)
-  (set! (-> self next-message-time) 0)
-  ;; Set up collision shape (same as security-wall-method-22)
-  (let ((s2-0 (new 'process 'collide-shape self (collide-list-enum usually-hit-by-player))))
-    (let ((v1-0 (new 'process 'collide-shape-prim-mesh s2-0 (the-as uint 0) (the-as uint 0))))
-      (set! (-> v1-0 prim-core collide-as) (collide-spec blocking-plane camera-blocker))
-      (set! (-> v1-0 prim-core collide-with) (collide-spec jak player-list))
-      (set! (-> v1-0 prim-core action) (collide-action solid))
-      (set! (-> v1-0 transform-index) 3)
-      (set! (-> s2-0 total-prims) (the-as uint 1))
-      (set! (-> s2-0 root-prim) v1-0)
-      )
-    (set! (-> s2-0 nav-radius) (* 0.75 (-> s2-0 root-prim local-sphere w)))
-    (let ((v1-3 (-> s2-0 root-prim)))
-      (set! (-> s2-0 backup-collide-as) (-> v1-3 prim-core collide-as))
-      (set! (-> s2-0 backup-collide-with) (-> v1-3 prim-core collide-with))
-      )
-    (set! (-> self root) s2-0)
-    )
-  ;; Set up transform and plane from the two endpoints (mirrors security-wall-method-22)
-  (let ((mtx (new 'stack-no-clear 'matrix))
-        (root (-> self root))
-        )
-    (vector+! (-> root trans) pt0 pt1)
-    (vector-float*! (-> root trans) (-> root trans) 0.5)
-    (+! (-> root trans y) (/ height 2))
-    (vector-! (-> mtx vector 0) pt1 pt0)
-    (let ((wall-len (vector-normalize-ret-len! (-> mtx vector 0) 1.0)))
-      (set! (-> root scale x) (/ wall-len METER_LENGTH))
-      (set! (-> root scale y) (/ height METER_LENGTH))
-      (set! (-> root scale z) 1.0)
-      (set! (-> mtx vector 1 quad) (-> (new 'static 'vector :y 1.0 :w 1.0) quad))
-      (vector-cross! (-> mtx vector 2) (-> mtx vector 0) (-> mtx vector 1))
-      (vector-normalize! (-> mtx vector 2) 1.0)
-      (matrix->quaternion (-> root quat) mtx)
-      (set! (-> self plane quad) (-> mtx vector 2 quad))
-      (set! (-> self plane w) (- (vector-dot (-> mtx vector 2) (-> root trans))))
-      (let ((sph (-> root root-prim local-sphere)))
-        (set! (-> sph x) 0.0)
-        (set! (-> sph y) (* 0.00024414062 (/ height 2)))
-        (set! (-> sph z) 0.0)
-        (set! (-> sph w) (* 0.5 (sqrtf (+ (* wall-len wall-len) (* height height)))))
-        )
-      )
-    )
-  ;; Load skeleton and visual setup
-  (initialize-skeleton
-    self
-    (the-as skeleton-group (art-group-get-by-name *level* "skel-security-wall" (the-as (pointer uint32) #f)))
-    (the-as pair 0)
-    )
-  (set! (-> self root event-self) 'touched)
-  (logior! (-> self draw status) (draw-control-status disable-fog))
-  (set-security-texture-masks! (the-as vector (-> self draw mgeo header texture-usage-group data 4)))
-  ;; Default color since pass 0 has no specific color
-  (set-vector! (-> self color) 1.0 1.0 1.0 1.0)
-  (set-security-color! (-> self color))
-  (set-vector! (-> self draw color-mult) 1.0 1.0 1.0 1.0)
-  (set-vector! (-> self draw color-emissive) 25.0 25.0 25.0 1.0)
-  (transform-post)
-  (go-virtual idle-close)
-  (none)
-  )
-
 (deftype merc-genc-transport-info (structure)
   ((id          uint32)
    (spawned     basic)
@@ -1486,29 +1417,6 @@
     (set! (-> *mood-control* speed-interp fog) 45.0)
     ;; Prevent random weather from interrupting the transition
     (set-time-for-random-weather! *mood-control* 99999.0 99999.0)
-    ;; Set up security wall
-    (set! (-> self slave 30)
-      (ppointer->handle
-        (process-spawn security-wall
-          (new 'static 'vector :x (meters  -4.32) :y (meters   5.74) :z (meters  49.33) :w 1.0)
-          (new 'static 'vector :x (meters  50.56) :y (meters   5.74) :z (meters  50.41) :w 1.0)
-          (meters 33)
-          :init security-wall-init-by-other
-          :name "security-wall-genc-mercenary"
-          )
-        )
-      )
-    (set! (-> self slave 32)
-      (ppointer->handle
-        (process-spawn security-wall
-          (new 'static 'vector :x (meters 234.05) :y (meters  14.81) :z (meters 391.90) :w 1.0)
-          (new 'static 'vector :x (meters 150.22) :y (meters  14.81) :z (meters 391.90) :w 1.0)
-          (meters 33)
-          :init security-wall-init-by-other
-          :name "security-wall-genc-mercenary-2"
-          )
-        )
-      )
     ;; Reset result screen flag  
     (set! (-> self data-int32 5) 0)
     ;; Mark timer as initialized
@@ -1528,10 +1436,10 @@
       gun gun-yellow gun-red gun-blue gun-dark 
       board
       gun-upgrade-speed gun-upgrade-ammo 
-      pass-red pass-green pass-yellow pass-blue 
+      pass-red pass-green pass-yellow 
       darkjak darkjak-bomb0 darkjak-bomb1 darkjak-invinc darkjak-giant
       ))
-    (logclear! (-> *game-info* features) (game-feature gun-upgrade-damage pass-red pass-green pass-yellow))
+    (logclear! (-> *game-info* features) (game-feature gun-upgrade-damage pass-blue))
     ;; Remove all cheats player could be using
     (logclear! (-> *game-info* secrets) (game-secrets invulnerable))
     (logclear! (-> *game-info* secrets) (game-secrets endless-dark))
@@ -1830,17 +1738,6 @@
     ;; Reset the random timer to a long delay before next weather change
     (set-time-for-random-weather! *mood-control* 18000.0 18000.0)
     
-    ;; Remove security walls
-    (let ((wall-proc (process-by-name "security-wall-genc-mercenary" *active-pool*)))
-      (when wall-proc
-        (deactivate wall-proc)
-        )
-    )
-    (let ((wall-proc (process-by-name "security-wall-genc-mercenary-2" *active-pool*)))
-      (when wall-proc
-        (deactivate wall-proc)
-        )
-    )
     (none)
     )
   )
