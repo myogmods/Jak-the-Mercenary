@@ -1735,7 +1735,7 @@ into 7 sections, which might explain the weird sizes in the center.
   "Is drawable arg0 visible? Note that this will return #f if the visibility data is not loaded."
 
   (case (-> this name) :comp name=
-    (('extras-ctyslumc 'extras-ctygenc 'extras-forest 'merc-slumc 'merc-genc 'merc-markb 'mercforest)
+    (('extras-ctyslumc 'extras-ctygenc 'extras-forest 'ctymarkb 'merc-slumc 'merc-genc 'merc-markb 'mercforest)
      ;; some custom level -> return true
      (return #t)))
 
