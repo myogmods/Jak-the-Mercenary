@@ -1416,7 +1416,7 @@
     ((= attack-mode 'eco-yellow) 7)
     ((= attack-mode 'eco-red)    8)
     ((= attack-mode 'eco-blue)   9)
-    ((= attack-mode 'eco-dark)   10)
+    ((or (= attack-mode 'eco-dark) (= attack-mode 'explode))  10) ;; peacemaker shock or spread count as same
     ((= attack-mode 'board)      11)
     ((= attack-mode 'board-spin) 12)
     (else                        13)
@@ -1445,7 +1445,8 @@
                     ((= attack-mode 'eco-yellow)      1.2) 
                     ((= attack-mode 'eco-red)         1.4)
                     ((= attack-mode 'eco-blue)        0.8)
-                    ((or (= attack-mode 'eco-dark) (= attack-mode 'explode))        2.0) ;; peacemaker uses two attack modes at same time >.>
+                    ((= attack-mode 'eco-dark)        2.0) ;; peacemaker direct hit
+                    ((= attack-mode 'explode)         2.0) ;; peacemaker shock spread 
                     ((= attack-mode 'board)           1.0)
                     ((= attack-mode 'board-spin)      5.0)
                     (else                             1.0)
@@ -1463,7 +1464,8 @@
                        ((= attack-mode 'eco-yellow) 30)  
                        ((= attack-mode 'eco-red)    30)  
                        ((= attack-mode 'eco-blue)   45)  
-                       ((= attack-mode 'eco-dark)   30)  
+                       ((= attack-mode 'eco-dark)   3)  ;; peacemaker direct hit
+                       ((= attack-mode 'explode)    10) ;; peacemaker shock spread
                        ((= attack-mode 'board)      30)  
                        ((= attack-mode 'board-spin) 30)   
                        (else                        30)
